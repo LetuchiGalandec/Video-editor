@@ -1,0 +1,22 @@
+{
+  "name": "cropcorn",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cropcorn — paste a YouTube link, trim a clip, download it or save it to your channel as Private.",
+  "workspaces": [
+    "apps/*",
+    "e2e"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c yellow,cyan \"npm run start:dev -w server\" \"npm run start -w web\"",
+    "test": "npm run test -w server && npm run test -w web",
+    "e2e": "npm run e2e -w cropcorn-e2e",
+    "build": "npm run build -w server && npm run build -w web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
