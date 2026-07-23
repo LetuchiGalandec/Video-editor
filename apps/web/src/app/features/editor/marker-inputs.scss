@@ -1,0 +1,92 @@
+.markers {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.marker-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.marker-group-end {
+  margin-left: auto;
+}
+
+.marker-label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+.marker-field {
+  width: 6.2rem;
+  background: var(--color-bg);
+  border: 1.5px solid var(--color-edge);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  text-align: center;
+  padding: 0.45em 0.5em;
+  font-variant-numeric: tabular-nums;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-butter);
+  }
+}
+
+.from-playhead {
+  background: transparent;
+  border: 1.5px dashed var(--color-edge);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-dim);
+  font-size: 0.78rem;
+  padding: 0.4em 0.7em;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+
+  &:hover {
+    color: var(--color-butter);
+    border-color: var(--color-butter);
+  }
+}
+
+.selection-length {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45em;
+  margin-inline: auto;
+}
+
+.length-value {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  color: var(--color-butter);
+  font-variant-numeric: tabular-nums;
+}
+
+.length-caption {
+  font-size: 0.78rem;
+  color: var(--color-text-dim);
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 560px) {
+  .marker-group-end {
+    margin-left: 0;
+  }
+
+  .selection-length {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}

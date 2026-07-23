@@ -1,0 +1,39 @@
+<div class="track" #track (pointerdown)="onTrackPointerDown($event)">
+  <div class="dim dim-left" [style.width.%]="inPct()"></div>
+  <div class="selection" [style.left.%]="inPct()" [style.width.%]="outPct() - inPct()"></div>
+  <div class="dim dim-right" [style.left.%]="outPct()" [style.width.%]="100 - outPct()"></div>
+
+  <div class="playhead" [style.left.%]="playheadPct()" aria-hidden="true"></div>
+
+  <button
+    type="button"
+    class="handle handle-in"
+    role="slider"
+    aria-label="Clip start"
+    [attr.aria-valuemin]="0"
+    [attr.aria-valuemax]="duration()"
+    [attr.aria-valuenow]="markIn()"
+    [attr.aria-valuetext]="inLabel()"
+    [style.left.%]="inPct()"
+    (pointerdown)="onHandlePointerDown('in', $event)"
+    (keydown)="onHandleKeydown('in', $event)"
+  >
+    <span class="chip">{{ inLabel() }}</span>
+  </button>
+
+  <button
+    type="button"
+    class="handle handle-out"
+    role="slider"
+    aria-label="Clip end"
+    [attr.aria-valuemin]="0"
+    [attr.aria-valuemax]="duration()"
+    [attr.aria-valuenow]="markOut()"
+    [attr.aria-valuetext]="outLabel()"
+    [style.left.%]="outPct()"
+    (pointerdown)="onHandlePointerDown('out', $event)"
+    (keydown)="onHandleKeydown('out', $event)"
+  >
+    <span class="chip">{{ outLabel() }}</span>
+  </button>
+</div>

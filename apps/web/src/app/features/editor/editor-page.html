@@ -12,6 +12,17 @@
       (toggleMute)="player.toggleMute()"
       (volumeChange)="player.setVolume($event)"
     />
+
+    <div class="trim-panel">
+      <app-trim-timeline
+        [duration]="store.duration()"
+        [currentTime]="store.currentTime()"
+        [(markIn)]="store.markIn"
+        [(markOut)]="store.markOut"
+        (seek)="player.seek($event)"
+      />
+      <app-marker-inputs />
+    </div>
   </section>
 } @else {
   <div class="loading" role="status">

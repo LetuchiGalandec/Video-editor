@@ -3,11 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../core/api.service';
 import { ControlsBar } from './controls-bar';
 import { EditorStore } from './editor-store';
+import { MarkerInputs } from './marker-inputs';
+import { TrimTimeline } from './trim-timeline/trim-timeline';
 import { VideoPlayer } from './video-player';
 
 @Component({
   selector: 'app-editor-page',
-  imports: [VideoPlayer, ControlsBar],
+  imports: [VideoPlayer, ControlsBar, TrimTimeline, MarkerInputs],
   providers: [EditorStore],
   templateUrl: './editor-page.html',
   styleUrl: './editor-page.scss',

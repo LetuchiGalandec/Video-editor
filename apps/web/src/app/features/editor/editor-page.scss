@@ -26,6 +26,16 @@
   flex-shrink: 0;
 }
 
+.trim-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-edge);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
 .loading {
   flex: 1;
   display: flex;

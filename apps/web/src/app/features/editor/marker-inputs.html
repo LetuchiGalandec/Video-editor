@@ -1,0 +1,50 @@
+<div class="markers">
+  <div class="marker-group">
+    <label class="marker-label" for="mark-in">Start</label>
+    <input
+      id="mark-in"
+      class="marker-field"
+      type="text"
+      inputmode="decimal"
+      autocomplete="off"
+      spellcheck="false"
+      [value]="inText()"
+      (change)="commit('in', $any($event.target))"
+    />
+    <button
+      class="from-playhead"
+      type="button"
+      title="Set start to the playhead"
+      (click)="setFromPlayhead('in')"
+    >
+      ⤓ playhead
+    </button>
+  </div>
+
+  <div class="selection-length" aria-live="polite">
+    <span class="length-value">{{ lengthText() }}</span>
+    <span class="length-caption">selected</span>
+  </div>
+
+  <div class="marker-group marker-group-end">
+    <label class="marker-label" for="mark-out">End</label>
+    <input
+      id="mark-out"
+      class="marker-field"
+      type="text"
+      inputmode="decimal"
+      autocomplete="off"
+      spellcheck="false"
+      [value]="outText()"
+      (change)="commit('out', $any($event.target))"
+    />
+    <button
+      class="from-playhead"
+      type="button"
+      title="Set end to the playhead"
+      (click)="setFromPlayhead('out')"
+    >
+      ⤓ playhead
+    </button>
+  </div>
+</div>
