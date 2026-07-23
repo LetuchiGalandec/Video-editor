@@ -30,6 +30,10 @@ Open http://localhost:4200, paste a YouTube link, hit **Fetch it**.
   - *Frame-accurate* (default) — re-encodes, exact to the frame
   - *Fast cut* — instant stream copy, snaps to keyframes (± a few seconds)
 - **Download** the .mp4, or **Save to YouTube** as a Private video (OAuth)
+- **Multi-user**: any number of Google accounts can sign in; each browser gets its
+  own session (signed cookie) and only ever touches its own channel
+- **Playlists**: on upload, drop the clip into an existing playlist or create a
+  new private one
 - Fetched files and clips are swept from disk after 6 h (configurable)
 
 ## Save-to-YouTube setup (one-time, ~5 minutes)
@@ -37,18 +41,30 @@ Open http://localhost:4200, paste a YouTube link, hit **Fetch it**.
 1. Create a project at [console.cloud.google.com](https://console.cloud.google.com).
 2. **APIs & Services → Library** → enable **YouTube Data API v3**.
 3. **OAuth consent screen** → External → publishing status **Testing** → add your
-   own Gmail as a *test user* → add scope `https://www.googleapis.com/auth/youtube.upload`.
+   own Gmail as a *test user* → add both scopes:
+   `https://www.googleapis.com/auth/youtube.upload` (upload the clip) and
+   `https://www.googleapis.com/auth/youtube` (list/create playlists + read your
+   channel name).
 4. **Credentials → Create credentials → OAuth client ID** → *Web application* →
    authorized redirect URI: `http://localhost:3000/api/auth/google/callback`.
 5. `cp apps/server/.env.example apps/server/.env` and fill in
    `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`. Restart the dev server.
 
-Then click **Connect Google** on a clip's result page.
+Then on a clip's result page: **Sign in with YouTube** → pick a playlist (or
+"Create new playlist…") → **Save to YouTube**. The clip uploads Private to your
+channel and lands in that playlist.
+
+**Built multi-user, run locally.** The app is architected like a real public
+product — each browser gets its own signed session cookie, tokens are stored
+per-account, and an upload can only ever reach the channel that signed in. You
+just happen to run it on your own machine (which is also what keeps the *fetch*
+side legal and un-blocked — see below). Anyone who opens your local instance
+signs in as themselves and touches only their own channel.
 
 **Known quirks of Testing mode:** refresh tokens expire every 7 days (the app
-shows "Connect Google" again — just reconnect), and the default API quota
+shows "Sign in with YouTube" again — just reconnect), and the default API quota
 allows about **6 uploads per day** (`videos.insert` costs 1,600 of 10,000
-daily units).
+daily units; adding to a playlist is a further 50).
 
 ## Age-restricted videos
 

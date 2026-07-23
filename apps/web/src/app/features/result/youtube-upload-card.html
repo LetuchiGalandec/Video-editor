@@ -20,11 +20,20 @@
     }
     @case (!status()!.authorized) {
       <div class="connect-row">
-        <p class="muted">Connect your Google account to tuck this clip into your channel.</p>
-        <button class="btn btn-butter" type="button" (click)="connect()">Connect Google</button>
+        <p class="muted">Sign in with your YouTube account to save this clip to your channel.</p>
+        <button class="btn btn-butter" type="button" (click)="connect()">
+          Sign in with YouTube
+        </button>
       </div>
     }
     @default {
+      <div class="signed-in-row">
+        <span class="signed-in">
+          Signed in as <strong>{{ status()!.user?.name ?? 'your account' }}</strong>
+        </span>
+        <button class="link-btn" type="button" (click)="signOut()">Sign out</button>
+      </div>
+
       @if (watchUrl()) {
         <div class="done-box">
           <p>
@@ -35,25 +44,52 @@
       } @else {
         <div class="upload-form">
           <label class="field-label" for="yt-title">Title</label>
-          <div class="form-row">
+          <input
+            id="yt-title"
+            class="title-input"
+            type="text"
+            maxlength="100"
+            [value]="title()"
+            (input)="onTitleInput($any($event.target).value)"
+            [disabled]="uploading()"
+          />
+
+          <label class="field-label" for="yt-playlist">Add to playlist</label>
+          <select
+            id="yt-playlist"
+            class="playlist-select"
+            [value]="selectedPlaylist()"
+            (change)="selectedPlaylist.set($any($event.target).value)"
+            [disabled]="uploading()"
+          >
+            <option value="">Don't add to a playlist</option>
+            @for (playlist of playlists(); track playlist.id) {
+              <option [value]="playlist.id">{{ playlist.title }}</option>
+            }
+            <option [value]="newPlaylistSentinel">➕ Create new playlist…</option>
+          </select>
+
+          @if (creatingPlaylist()) {
             <input
-              id="yt-title"
               class="title-input"
               type="text"
-              maxlength="100"
-              [value]="title()"
-              (input)="onTitleInput($any($event.target).value)"
+              maxlength="150"
+              placeholder="New playlist name"
+              aria-label="New playlist name"
+              [value]="newPlaylistTitle()"
+              (input)="newPlaylistTitle.set($any($event.target).value)"
               [disabled]="uploading()"
             />
-            <button
-              class="btn btn-butter"
-              type="button"
-              [disabled]="uploading() || !title().trim()"
-              (click)="upload()"
-            >
-              {{ uploading() ? 'Uploading…' : 'Save to YouTube' }}
-            </button>
-          </div>
+          }
+
+          <button
+            class="btn btn-butter save-btn"
+            type="button"
+            [disabled]="uploading() || !title().trim()"
+            (click)="upload()"
+          >
+            {{ uploading() ? 'Uploading…' : 'Save to YouTube' }} <span aria-hidden="true">▶</span>
+          </button>
         </div>
         @if (job(); as j) {
           <app-progress-card [job]="j" />

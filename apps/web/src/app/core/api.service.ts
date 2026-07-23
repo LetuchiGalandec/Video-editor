@@ -3,6 +3,26 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import type { ClipMode, Job, VideoMeta } from './api.models';
 
+export interface AuthUser {
+  name: string;
+}
+
+export interface AuthStatus {
+  configured: boolean;
+  authorized: boolean;
+  user?: AuthUser;
+}
+
+export interface Playlist {
+  id: string;
+  title: string;
+}
+
+export interface UploadOptions {
+  playlistId?: string;
+  newPlaylistTitle?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -40,12 +60,26 @@ export class ApiService {
     return this.http.get<AuthStatus>('/api/auth/status');
   }
 
-  startUpload(clipId: string, title: string, description: string): Observable<{ jobId: string }> {
-    return this.http.post<{ jobId: string }>('/api/uploads', { clipId, title, description });
+  signOut(): Observable<void> {
+    return this.http.post<void>('/api/auth/signout', {});
   }
-}
 
-export interface AuthStatus {
-  configured: boolean;
-  authorized: boolean;
+  listPlaylists(): Observable<Playlist[]> {
+    return this.http.get<Playlist[]>('/api/youtube/playlists');
+  }
+
+  startUpload(
+    clipId: string,
+    title: string,
+    description: string,
+    options: UploadOptions = {},
+  ): Observable<{ jobId: string }> {
+    return this.http.post<{ jobId: string }>('/api/uploads', {
+      clipId,
+      title,
+      description,
+      playlistId: options.playlistId ?? '',
+      newPlaylistTitle: options.newPlaylistTitle ?? '',
+    });
+  }
 }

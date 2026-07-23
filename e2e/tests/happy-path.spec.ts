@@ -37,7 +37,9 @@ test('fetch → trim → generate → download → upload state', async ({ page 
   expect((await response.body()).length).toBeGreaterThan(10_000);
 
   // Without Google credentials the upload card must explain itself instead of failing.
-  await expect(page.locator('.upload-card')).toContainText(/isn't configured|Connect Google/);
+  await expect(page.locator('.upload-card')).toContainText(
+    /isn't configured|Sign in with YouTube/,
+  );
 });
 
 test('rejects a non-YouTube link before hitting the server', async ({ page }) => {
