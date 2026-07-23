@@ -5,6 +5,8 @@ import ffmpegPath from 'ffmpeg-static';
 import { DownloadProgressTracker, PROGRESS_TEMPLATE } from './ytdlp-progress';
 import { buildCookieFlags } from './cookie-flags';
 import type { CookieFlags, CookieOptions } from './cookie-flags';
+import { buildSectionArgs } from './section-args';
+import type { CutMode } from './section-args';
 import {
   runProcess,
   ProcessExitError,
@@ -18,9 +20,17 @@ import type { FetchedVideo, VideoFetcher, VideoProbe } from './video-fetcher';
 const buildFormat = (maxHeight: number): string =>
   `bv*[height<=${maxHeight}][vcodec^=avc1]+ba[ext=m4a]/bv*[height<=${maxHeight}]+ba/b[height<=${maxHeight}]/b`;
 
-// Make yt-dlp itself give up on dead sockets quickly and retry a bounded number
-// of times, so a network stall fails fast instead of hanging on YouTube.
-const RESILIENCE_FLAGS = { socketTimeout: 30, retries: 3, fragmentRetries: 3 };
+// - socketTimeout/retries: give up on dead sockets fast, retry a bounded number
+//   of times, so a stall fails fast instead of hanging.
+// - jsRuntimes: let yt-dlp use the Node binary already running this server to
+//   solve YouTube's signature/throttling params. Without it, section downloads
+//   (ffmpeg range requests) get HTTP 403 Forbidden.
+const RESILIENCE_FLAGS = {
+  socketTimeout: 30,
+  retries: 3,
+  fragmentRetries: 3,
+  jsRuntimes: `node:${process.execPath}`,
+};
 
 const PROBE_TIMEOUT_MS = 90_000;
 // A healthy download prints a progress line ~every second; this much silence
@@ -35,7 +45,8 @@ interface YtDlpModuleExtras {
 }
 const ytdlpModule = youtubedl as unknown as YtDlpModuleExtras;
 
-const YT_DLP_BINARY = process.env.YTDLP_PATH ?? ytdlpModule.constants.YOUTUBE_DL_PATH;
+const YT_DLP_BINARY =
+  process.env.YTDLP_PATH ?? ytdlpModule.constants.YOUTUBE_DL_PATH;
 
 export interface FetcherOptions extends CookieOptions {
   /** Highest video height to fetch (default 1080). Lower = smaller/faster. */
@@ -47,10 +58,19 @@ interface YtDlpInfo {
   title?: string;
   duration?: number;
   is_live?: boolean;
+  playable_in_embed?: boolean;
+  age_limit?: number;
 }
 
 const STDERR_PATTERNS: Array<[RegExp, () => FetchError]> = [
-  [/private video/i, () => new FetchError('This video is private, so it cannot be fetched.', 'private')],
+  [
+    /private video/i,
+    () =>
+      new FetchError(
+        'This video is private, so it cannot be fetched.',
+        'private',
+      ),
+  ],
   [
     /sign in to confirm your age|age.restricted|confirm your age/i,
     () =>
@@ -61,7 +81,8 @@ const STDERR_PATTERNS: Array<[RegExp, () => FetchError]> = [
   ],
   [
     /video unavailable|no longer available|has been removed/i,
-    () => new FetchError('This video is unavailable on YouTube.', 'unavailable'),
+    () =>
+      new FetchError('This video is unavailable on YouTube.', 'unavailable'),
   ],
   [
     /premium members|members-only|join this channel|drm/i,
@@ -112,7 +133,10 @@ async function runYtDlp(
       );
     }
     if (error instanceof ProcessTimeoutError) {
-      throw new FetchError('Fetching took too long and was stopped. Please try again.', 'fetch_failed');
+      throw new FetchError(
+        'Fetching took too long and was stopped. Please try again.',
+        'fetch_failed',
+      );
     }
     if (error instanceof ProcessExitError) {
       throw mapYtDlpError(error.stderr || error.message);
@@ -127,7 +151,9 @@ export class YtDlpFetcher implements VideoFetcher {
 
   constructor(options: FetcherOptions = {}) {
     this.cookieFlags = buildCookieFlags(options);
-    this.format = buildFormat(options.maxHeight && options.maxHeight > 0 ? options.maxHeight : 1080);
+    this.format = buildFormat(
+      options.maxHeight && options.maxHeight > 0 ? options.maxHeight : 1080,
+    );
   }
 
   async probe(url: string): Promise<VideoProbe> {
@@ -143,13 +169,18 @@ export class YtDlpFetcher implements VideoFetcher {
     try {
       info = JSON.parse(stdout) as YtDlpInfo;
     } catch {
-      throw new FetchError('yt-dlp returned unreadable video metadata.', 'fetch_failed');
+      throw new FetchError(
+        'yt-dlp returned unreadable video metadata.',
+        'fetch_failed',
+      );
     }
     return {
       videoId: info.id ?? 'unknown',
       title: info.title ?? 'Untitled video',
       durationSec: info.duration ?? 0,
       isLive: info.is_live === true,
+      playableInEmbed: info.playable_in_embed !== false,
+      ageLimit: info.age_limit ?? 0,
     };
   }
 
@@ -182,5 +213,40 @@ export class YtDlpFetcher implements VideoFetcher {
       },
     );
     return { filePath: path.join(destDir, 'source.mp4') };
+  }
+
+  async downloadSection(
+    url: string,
+    startSec: number,
+    endSec: number,
+    cut: CutMode,
+    destDir: string,
+    onProgress: (percent: number) => void,
+  ): Promise<FetchedVideo> {
+    await mkdir(destDir, { recursive: true });
+    const tracker = new DownloadProgressTracker();
+    await runYtDlp(
+      url,
+      {
+        noPlaylist: true,
+        format: this.format,
+        mergeOutputFormat: 'mp4',
+        output: path.join(destDir, 'clip.%(ext)s'),
+        newline: true,
+        progressTemplate: PROGRESS_TEMPLATE,
+        noWarnings: true,
+        ...buildSectionArgs(startSec, endSec, cut),
+        ...RESILIENCE_FLAGS,
+        ...this.cookieFlags,
+        ...(ffmpegPath ? { ffmpegLocation: ffmpegPath } : {}),
+      },
+      (line) => {
+        const percent = tracker.onLine(line);
+        if (percent !== null) {
+          onProgress(percent);
+        }
+      },
+    );
+    return { filePath: path.join(destDir, 'clip.mp4') };
   }
 }

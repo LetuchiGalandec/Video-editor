@@ -13,9 +13,13 @@ describe('runProcess', () => {
   });
 
   it('rejects with ProcessExitError (code + stderr) on non-zero exit', async () => {
-    await expect(runProcess('sh', ['-c', 'echo boom >&2; exit 3'])).rejects.toSatisfy(
+    await expect(
+      runProcess('sh', ['-c', 'echo boom >&2; exit 3']),
+    ).rejects.toSatisfy(
       (error: unknown) =>
-        error instanceof ProcessExitError && error.code === 3 && error.stderr.includes('boom'),
+        error instanceof ProcessExitError &&
+        error.code === 3 &&
+        error.stderr.includes('boom'),
     );
   });
 
@@ -39,11 +43,21 @@ describe('runProcess', () => {
     expect(result.stdout).toBe('');
   });
 
+  it('treats stderr output as alive (ffmpeg-style progress resets the stall timer)', async () => {
+    // Emits only on stderr every ~50ms for ~250ms; stall window 200ms → must finish.
+    const result = await runProcess(
+      'sh',
+      ['-c', 'for i in 1 2 3 4 5; do echo e$i >&2; sleep 0.05; done'],
+      { onLine: () => {}, stallMs: 200 },
+    );
+    expect(result.stdout).toBe('');
+  });
+
   it('kills and rejects with ProcessTimeoutError past the hard cap', async () => {
     const start = Date.now();
-    await expect(runProcess('sh', ['-c', 'sleep 10'], { timeoutMs: 150 })).rejects.toBeInstanceOf(
-      ProcessTimeoutError,
-    );
+    await expect(
+      runProcess('sh', ['-c', 'sleep 10'], { timeoutMs: 150 }),
+    ).rejects.toBeInstanceOf(ProcessTimeoutError);
     expect(Date.now() - start).toBeLessThan(2000);
   });
 });

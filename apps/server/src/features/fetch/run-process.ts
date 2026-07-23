@@ -117,9 +117,15 @@ export function runProcess(
     }
     child.stderr.on('data', (chunk: Buffer) => {
       stderr += chunk.toString();
+      // Section downloads transfer through ffmpeg, which reports progress on
+      // stderr — treat any output as "still alive" so the watchdog only fires
+      // on a genuine stall (no output on either stream).
+      armStall();
     });
 
-    child.on('error', (error) => settle(() => reject(new ProcessExitError(null, error.message))));
+    child.on('error', (error) =>
+      settle(() => reject(new ProcessExitError(null, error.message))),
+    );
     child.on('close', (code) => {
       if (code === 0) {
         settle(() => resolve({ stdout }));

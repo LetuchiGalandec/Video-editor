@@ -1,8 +1,14 @@
+import type { CutMode } from './section-args';
+
 export interface VideoProbe {
   videoId: string;
   title: string;
   durationSec: number;
   isLive: boolean;
+  /** Whether YouTube allows this video in an embedded player (Quick preview). */
+  playableInEmbed: boolean;
+  /** 0 for unrestricted; >0 means age-gated. */
+  ageLimit: number;
 }
 
 export interface FetchedVideo {
@@ -34,8 +40,18 @@ export class FetchError extends Error {
  */
 export interface VideoFetcher {
   probe(url: string): Promise<VideoProbe>;
+  /** Full download into destDir (Precise mode). */
   download(
     url: string,
+    destDir: string,
+    onProgress: (percent: number) => void,
+  ): Promise<FetchedVideo>;
+  /** Download only [startSec, endSec] straight to a clip (Quick mode). */
+  downloadSection(
+    url: string,
+    startSec: number,
+    endSec: number,
+    cut: CutMode,
     destDir: string,
     onProgress: (percent: number) => void,
   ): Promise<FetchedVideo>;

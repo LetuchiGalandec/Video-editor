@@ -1,23 +1,20 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { ClipsService } from './clips.service';
-import type { ClipMeta } from './clips.service';
+import type { ClipMeta, CreateClipInput } from './clips.service';
 import type { ClipMode } from './ffmpeg-args';
 
 interface CreateClipDto {
+  source?: unknown;
   videoId?: unknown;
+  youtubeId?: unknown;
+  title?: unknown;
   startSec?: unknown;
   endSec?: unknown;
   mode?: unknown;
 }
+
+const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
 
 @Controller('clips')
 export class ClipsController {
@@ -26,12 +23,21 @@ export class ClipsController {
   @Post()
   @HttpCode(202)
   async create(@Body() body: CreateClipDto): Promise<{ jobId: string }> {
-    const job = await this.clips.createClip({
-      videoId: typeof body?.videoId === 'string' ? body.videoId : '',
+    const common = {
       startSec: Number(body?.startSec),
       endSec: Number(body?.endSec),
       mode: body?.mode as ClipMode,
-    });
+    };
+    const input: CreateClipInput =
+      body?.source === 'youtube'
+        ? {
+            source: 'youtube',
+            youtubeId: asString(body?.youtubeId),
+            title: asString(body?.title),
+            ...common,
+          }
+        : { source: 'downloaded', videoId: asString(body?.videoId), ...common };
+    const job = await this.clips.createClip(input);
     return { jobId: job.id };
   }
 
@@ -41,10 +47,7 @@ export class ClipsController {
   }
 
   @Get(':clipId/stream')
-  async stream(
-    @Param('clipId') clipId: string,
-    @Res() res: Response,
-  ): Promise<void> {
+  async stream(@Param('clipId') clipId: string, @Res() res: Response): Promise<void> {
     const filePath = await this.clips.clipPathOrThrow(clipId);
     res.sendFile(filePath, {
       headers: { 'Content-Type': 'video/mp4' },
@@ -54,10 +57,7 @@ export class ClipsController {
   }
 
   @Get(':clipId/file')
-  async file(
-    @Param('clipId') clipId: string,
-    @Res() res: Response,
-  ): Promise<void> {
+  async file(@Param('clipId') clipId: string, @Res() res: Response): Promise<void> {
     const filePath = await this.clips.clipPathOrThrow(clipId);
     res.sendFile(filePath, {
       headers: {

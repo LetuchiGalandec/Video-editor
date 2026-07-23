@@ -17,6 +17,13 @@ export interface VideoInfoFile {
   sourceUrl: string;
 }
 
+export interface ResolveResult {
+  youtubeId: string;
+  title: string;
+  durationSec: number;
+  playableInEmbed: boolean;
+}
+
 @Injectable()
 export class DownloadsService {
   constructor(
@@ -28,6 +35,36 @@ export class DownloadsService {
 
   videoDir(videoId: string): string {
     return path.join(this.config.dataDir, 'videos', videoId);
+  }
+
+  /** Metadata-only probe for the Quick (embed) flow — no download. */
+  async resolve(url: string): Promise<ResolveResult> {
+    if (!parseYoutubeVideoId(url)) {
+      throw new BadRequestException("That doesn't look like a YouTube video link.");
+    }
+    let probe;
+    try {
+      probe = await this.fetcher.probe(url);
+    } catch (error) {
+      // Surface friendly probe failures (private/age-restricted/…) as 4xx.
+      if (error instanceof FetchError) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
+    }
+    if (probe.isLive) {
+      throw new BadRequestException('Live streams are not supported.');
+    }
+    if (probe.durationSec > this.config.maxDurationSec) {
+      const hours = Math.round(this.config.maxDurationSec / 3600);
+      throw new BadRequestException(`This video is longer than the ${hours}-hour limit.`);
+    }
+    return {
+      youtubeId: probe.videoId,
+      title: probe.title,
+      durationSec: probe.durationSec,
+      playableInEmbed: probe.playableInEmbed,
+    };
   }
 
   startDownload(url: string): Job {

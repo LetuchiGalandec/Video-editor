@@ -4,13 +4,14 @@ import type { AppConfig } from '../../config/config';
 import { JobsModule } from '../jobs/jobs.module';
 import { DownloadsController } from './downloads.controller';
 import { DownloadsService } from './downloads.service';
+import { ResolveController } from './resolve.controller';
 import { FakeFetcher } from './fake.fetcher';
 import { VIDEO_FETCHER } from './video-fetcher';
 import { YtDlpFetcher } from './yt-dlp.fetcher';
 
 @Module({
   imports: [JobsModule],
-  controllers: [DownloadsController],
+  controllers: [DownloadsController, ResolveController],
   providers: [
     DownloadsService,
     {
@@ -26,6 +27,6 @@ import { YtDlpFetcher } from './yt-dlp.fetcher';
       inject: [APP_CONFIG],
     },
   ],
-  exports: [DownloadsService],
+  exports: [DownloadsService, VIDEO_FETCHER],
 })
 export class FetchModule {}
