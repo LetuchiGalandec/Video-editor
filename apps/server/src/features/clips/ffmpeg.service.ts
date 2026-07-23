@@ -12,11 +12,16 @@ export class FfmpegService {
   private readonly binary = process.env.FFMPEG_PATH ?? ffmpegPath ?? 'ffmpeg';
 
   /** Runs the trim, reporting progress as a 0-100 percent of the clip duration. */
-  cut(input: ClipArgsInput, onProgress: (percent: number) => void): Promise<void> {
+  cut(
+    input: ClipArgsInput,
+    onProgress: (percent: number) => void,
+  ): Promise<void> {
     const clipDuration = input.endSec - input.startSec;
     const args = buildClipArgs(input);
     return new Promise((resolve, reject) => {
-      const child = spawn(this.binary, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+      const child = spawn(this.binary, args, {
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
       let stderr = '';
       child.stderr.on('data', (chunk: Buffer) => {
         stderr += chunk.toString();
@@ -27,12 +32,18 @@ export class FfmpegService {
           onProgress(Math.min(99, (seconds / clipDuration) * 100));
         }
       });
-      child.on('error', (error) => reject(new Error(`ffmpeg failed to start: ${error.message}`)));
+      child.on('error', (error) =>
+        reject(new Error(`ffmpeg failed to start: ${error.message}`)),
+      );
       child.on('close', (code) => {
         if (code === 0) {
           resolve();
         } else {
-          reject(new Error(`ffmpeg exited with ${code}: ${stderr.slice(-STDERR_TAIL_CHARS)}`));
+          reject(
+            new Error(
+              `ffmpeg exited with ${code}: ${stderr.slice(-STDERR_TAIL_CHARS)}`,
+            ),
+          );
         }
       });
     });

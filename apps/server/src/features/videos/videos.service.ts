@@ -1,11 +1,17 @@
 import { readFile, stat } from 'node:fs/promises';
 import * as path from 'node:path';
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { APP_CONFIG } from '../../config/config';
 import type { AppConfig } from '../../config/config';
 import { ProbeService } from './probe.service';
 
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export interface VideoMeta {
   videoId: string;

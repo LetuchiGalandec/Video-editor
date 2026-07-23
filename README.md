@@ -50,6 +50,23 @@ shows "Connect Google" again — just reconnect), and the default API quota
 allows about **6 uploads per day** (`videos.insert` costs 1,600 of 10,000
 daily units).
 
+## Age-restricted videos
+
+There's no trick that skips YouTube's age gate — it's an authentication check.
+The supported way is to let yt-dlp use **your own signed-in session** via
+browser cookies. In `apps/server/.env` set:
+
+```bash
+YT_COOKIES_FROM_BROWSER=chrome   # or safari, firefox, edge, brave…
+```
+
+Quit that browser first (it locks its cookie database while open), restart the
+dev server, and age-restricted videos fetch like any other. Prefer not to read
+the browser directly? Export a `cookies.txt` and set `YT_COOKIES_FILE` instead.
+
+This authenticates as you viewing content you're already allowed to see — it
+isn't circumventing anything. The same personal-use ToS caveat below applies.
+
 ## Honest tech limits
 
 - **Fetching uses yt-dlp**, which works against YouTube's ToS — fine for
@@ -57,7 +74,8 @@ daily units).
   `VideoFetcher` interface so a compliant vendor API could be swapped in.
 - **yt-dlp breaks periodically** when YouTube changes internals. If fetches
   start failing: `npm update youtube-dl-exec`.
-- Private / age-restricted / DRM / live videos can't be fetched.
+- Private / DRM / live videos still can't be fetched. Age-restricted ones work
+  once cookies are configured (above).
 
 ## Scripts
 

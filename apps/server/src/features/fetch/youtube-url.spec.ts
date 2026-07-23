@@ -6,7 +6,10 @@ describe('parseYoutubeVideoId', () => {
     ['https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'dQw4w9WgXcQ'],
     ['https://youtube.com/watch?v=dQw4w9WgXcQ', 'dQw4w9WgXcQ'],
     ['https://m.youtube.com/watch?v=dQw4w9WgXcQ', 'dQw4w9WgXcQ'],
-    ['https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s&ab_channel=x', 'dQw4w9WgXcQ'],
+    [
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s&ab_channel=x',
+      'dQw4w9WgXcQ',
+    ],
     ['https://youtu.be/dQw4w9WgXcQ', 'dQw4w9WgXcQ'],
     ['https://youtu.be/dQw4w9WgXcQ?t=10', 'dQw4w9WgXcQ'],
     ['https://www.youtube.com/shorts/dQw4w9WgXcQ', 'dQw4w9WgXcQ'],

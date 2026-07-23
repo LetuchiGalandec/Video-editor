@@ -55,7 +55,12 @@ describe('buildClipArgs', () => {
   });
 
   it('encodes the selection as an explicit duration', () => {
-    const args = buildClipArgs({ ...base, mode: 'accurate', startSec: 10, endSec: 12.75 });
+    const args = buildClipArgs({
+      ...base,
+      mode: 'accurate',
+      startSec: 10,
+      endSec: 12.75,
+    });
     const tIndex = args.indexOf('-t');
     expect(args[tIndex + 1]).toBe('2.75');
     expect(args).not.toContain('-to');

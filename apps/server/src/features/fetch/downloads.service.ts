@@ -32,7 +32,9 @@ export class DownloadsService {
 
   startDownload(url: string): Job {
     if (!parseYoutubeVideoId(url)) {
-      throw new BadRequestException("That doesn't look like a YouTube video link.");
+      throw new BadRequestException(
+        "That doesn't look like a YouTube video link.",
+      );
     }
     const job = this.store.create('download');
     const destDir = this.videoDir(job.id);
@@ -58,7 +60,10 @@ export class DownloadsService {
         durationSec: probe.durationSec,
         sourceUrl: url,
       };
-      await writeFile(path.join(destDir, 'info.json'), JSON.stringify(info, null, 2));
+      await writeFile(
+        path.join(destDir, 'info.json'),
+        JSON.stringify(info, null, 2),
+      );
       this.store.patch(job.id, { result: { videoId: job.id } });
     });
 

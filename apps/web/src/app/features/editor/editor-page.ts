@@ -37,7 +37,9 @@ export class EditorPage {
   });
   protected readonly errorText = computed(() => {
     const job = this.clipJob();
-    return this.requestError() || (job?.state === 'error' ? (job.error ?? 'Generating failed.') : '');
+    return (
+      this.requestError() || (job?.state === 'error' ? (job.error ?? 'Generating failed.') : '')
+    );
   });
 
   constructor() {

@@ -5,6 +5,8 @@ import * as readline from 'node:readline';
 import youtubedl from 'youtube-dl-exec';
 import ffmpegPath from 'ffmpeg-static';
 import { DownloadProgressTracker, PROGRESS_TEMPLATE } from './ytdlp-progress';
+import { buildCookieFlags } from './cookie-flags';
+import type { CookieFlags, CookieOptions } from './cookie-flags';
 import { FetchError } from './video-fetcher';
 import type { FetchedVideo, VideoFetcher, VideoProbe } from './video-fetcher';
 
@@ -20,7 +22,8 @@ interface YtDlpModuleExtras {
 }
 const ytdlpModule = youtubedl as unknown as YtDlpModuleExtras;
 
-const YT_DLP_BINARY = process.env.YTDLP_PATH ?? ytdlpModule.constants.YOUTUBE_DL_PATH;
+const YT_DLP_BINARY =
+  process.env.YTDLP_PATH ?? ytdlpModule.constants.YOUTUBE_DL_PATH;
 
 interface YtDlpInfo {
   id?: string;
@@ -30,18 +33,34 @@ interface YtDlpInfo {
 }
 
 const STDERR_PATTERNS: Array<[RegExp, () => FetchError]> = [
-  [/private video/i, () => new FetchError('This video is private, so it cannot be fetched.', 'private')],
   [
-    /sign in to confirm your age|age.restricted/i,
-    () => new FetchError('This video is age-restricted, so it cannot be fetched.', 'age_restricted'),
+    /private video/i,
+    () =>
+      new FetchError(
+        'This video is private, so it cannot be fetched.',
+        'private',
+      ),
+  ],
+  [
+    /sign in to confirm your age|age.restricted|confirm your age/i,
+    () =>
+      new FetchError(
+        'This video is age-restricted. Set YT_COOKIES_FROM_BROWSER (e.g. "chrome" or "safari") in apps/server/.env so Cropcorn can use your signed-in YouTube session, then try again.',
+        'age_restricted',
+      ),
   ],
   [
     /video unavailable|no longer available|has been removed/i,
-    () => new FetchError('This video is unavailable on YouTube.', 'unavailable'),
+    () =>
+      new FetchError('This video is unavailable on YouTube.', 'unavailable'),
   ],
   [
     /premium members|members-only|join this channel|drm/i,
-    () => new FetchError('This video is members-only or DRM-protected, so it cannot be fetched.', 'drm'),
+    () =>
+      new FetchError(
+        'This video is members-only or DRM-protected, so it cannot be fetched.',
+        'drm',
+      ),
   ],
 ];
 
@@ -66,10 +85,16 @@ interface RunResult {
  * runner, which mis-splits binary paths containing spaces on macOS/Linux.
  * youtube-dl-exec still supplies the pinned binary and the flag serializer.
  */
-function runYtDlp(url: string, flags: Record<string, unknown>, onLine?: (line: string) => void): Promise<RunResult> {
+function runYtDlp(
+  url: string,
+  flags: Record<string, unknown>,
+  onLine?: (line: string) => void,
+): Promise<RunResult> {
   const argv = [url, ...ytdlpModule.args(flags)];
   return new Promise((resolve, reject) => {
-    const child = spawn(YT_DLP_BINARY, argv, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(YT_DLP_BINARY, argv, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
     let stdout = '';
     let stderr = '';
     child.stderr.on('data', (chunk: Buffer) => {
@@ -94,18 +119,28 @@ function runYtDlp(url: string, flags: Record<string, unknown>, onLine?: (line: s
 }
 
 export class YtDlpFetcher implements VideoFetcher {
+  private readonly cookieFlags: CookieFlags;
+
+  constructor(cookieOptions: CookieOptions = {}) {
+    this.cookieFlags = buildCookieFlags(cookieOptions);
+  }
+
   async probe(url: string): Promise<VideoProbe> {
     const { stdout } = await runYtDlp(url, {
       dumpSingleJson: true,
       noPlaylist: true,
       skipDownload: true,
       noWarnings: true,
+      ...this.cookieFlags,
     });
     let info: YtDlpInfo;
     try {
       info = JSON.parse(stdout) as YtDlpInfo;
     } catch {
-      throw new FetchError('yt-dlp returned unreadable video metadata.', 'fetch_failed');
+      throw new FetchError(
+        'yt-dlp returned unreadable video metadata.',
+        'fetch_failed',
+      );
     }
     return {
       videoId: info.id ?? 'unknown',
@@ -132,6 +167,7 @@ export class YtDlpFetcher implements VideoFetcher {
         newline: true,
         progressTemplate: PROGRESS_TEMPLATE,
         noWarnings: true,
+        ...this.cookieFlags,
         ...(ffmpegPath ? { ffmpegLocation: ffmpegPath } : {}),
       },
       (line) => {

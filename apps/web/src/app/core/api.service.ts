@@ -23,7 +23,12 @@ export class ApiService {
     return `/api/videos/${videoId}/stream`;
   }
 
-  createClip(videoId: string, startSec: number, endSec: number, mode: ClipMode): Observable<{ jobId: string }> {
+  createClip(
+    videoId: string,
+    startSec: number,
+    endSec: number,
+    mode: ClipMode,
+  ): Observable<{ jobId: string }> {
     return this.http.post<{ jobId: string }>('/api/clips', { videoId, startSec, endSec, mode });
   }
 

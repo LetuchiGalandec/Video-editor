@@ -16,7 +16,12 @@ import { YtDlpFetcher } from './yt-dlp.fetcher';
     {
       provide: VIDEO_FETCHER,
       useFactory: (config: AppConfig) =>
-        config.fetcher === 'fake' ? new FakeFetcher(config.fixturePath) : new YtDlpFetcher(),
+        config.fetcher === 'fake'
+          ? new FakeFetcher(config.fixturePath)
+          : new YtDlpFetcher({
+              cookiesFromBrowser: config.ytCookiesFromBrowser,
+              cookiesFile: config.ytCookiesFile,
+            }),
       inject: [APP_CONFIG],
     },
   ],

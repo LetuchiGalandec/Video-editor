@@ -13,7 +13,10 @@ export class VideosController {
   }
 
   @Get(':videoId/stream')
-  async stream(@Param('videoId') videoId: string, @Res() res: Response): Promise<void> {
+  async stream(
+    @Param('videoId') videoId: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const filePath = await this.videos.sourcePathOrThrow(videoId);
     // res.sendFile implements Range/206, If-Range and Accept-Ranges for us.
     // dotfiles: 'allow' because the data dir is named `.data`, which the

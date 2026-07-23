@@ -49,7 +49,9 @@ describe('VideosController', () => {
   });
 
   it('returns metadata combining info.json and ffprobe', async () => {
-    const res = await request(app.getHttpServer()).get(`/api/videos/${videoId}/meta`).expect(200);
+    const res = await request(app.getHttpServer())
+      .get(`/api/videos/${videoId}/meta`)
+      .expect(200);
     expect(res.body.title).toBe('Sample fixture video');
     expect(res.body.durationSec).toBeGreaterThan(3.5);
     expect(res.body.durationSec).toBeLessThan(4.5);
@@ -69,17 +71,27 @@ describe('VideosController', () => {
   });
 
   it('serves the whole file without a Range header', async () => {
-    const res = await request(app.getHttpServer()).get(`/api/videos/${videoId}/stream`).expect(200);
+    const res = await request(app.getHttpServer())
+      .get(`/api/videos/${videoId}/stream`)
+      .expect(200);
     expect(Number(res.headers['content-length'])).toBeGreaterThan(100_000);
   });
 
   it('404s for unknown video ids', async () => {
-    await request(app.getHttpServer()).get(`/api/videos/${randomUUID()}/meta`).expect(404);
-    await request(app.getHttpServer()).get(`/api/videos/${randomUUID()}/stream`).expect(404);
+    await request(app.getHttpServer())
+      .get(`/api/videos/${randomUUID()}/meta`)
+      .expect(404);
+    await request(app.getHttpServer())
+      .get(`/api/videos/${randomUUID()}/stream`)
+      .expect(404);
   });
 
   it('rejects ids that are not UUIDs (path safety)', async () => {
-    await request(app.getHttpServer()).get('/api/videos/..%2F..%2Fetc/stream').expect(400);
-    await request(app.getHttpServer()).get('/api/videos/not-a-uuid/meta').expect(400);
+    await request(app.getHttpServer())
+      .get('/api/videos/..%2F..%2Fetc/stream')
+      .expect(400);
+    await request(app.getHttpServer())
+      .get('/api/videos/not-a-uuid/meta')
+      .expect(400);
   });
 });

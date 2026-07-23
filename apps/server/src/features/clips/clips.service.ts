@@ -1,6 +1,11 @@
 import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { APP_CONFIG } from '../../config/config';
 import type { AppConfig } from '../../config/config';
 import { JobQueue } from '../jobs/job-queue';
@@ -68,7 +73,9 @@ export class ClipsService {
       startSec < 0 ||
       endSec - startSec < MIN_CLIP_SEC
     ) {
-      throw new BadRequestException('Pick a selection at least 0.2 seconds long.');
+      throw new BadRequestException(
+        'Pick a selection at least 0.2 seconds long.',
+      );
     }
     if (mode !== 'accurate' && mode !== 'fast') {
       throw new BadRequestException('Unknown cut mode.');
@@ -76,7 +83,9 @@ export class ClipsService {
     const sourcePath = await this.videos.sourcePathOrThrow(videoId);
     const media = await this.probe.probe(sourcePath);
     if (startSec >= media.durationSec) {
-      throw new BadRequestException('The selection starts after the video ends.');
+      throw new BadRequestException(
+        'The selection starts after the video ends.',
+      );
     }
     const cappedEnd = Math.min(endSec, media.durationSec);
 
@@ -87,7 +96,13 @@ export class ClipsService {
       await mkdir(clipDir, { recursive: true });
       const outputPath = path.join(clipDir, 'clip.mp4');
       await this.ffmpeg.cut(
-        { inputPath: sourcePath, outputPath, startSec, endSec: cappedEnd, mode },
+        {
+          inputPath: sourcePath,
+          outputPath,
+          startSec,
+          endSec: cappedEnd,
+          mode,
+        },
         (percent) => this.store.patch(job.id, { progress: percent }),
       );
       const videoMeta = await this.videos.meta(videoId);
@@ -98,7 +113,10 @@ export class ClipsService {
         endSec: cappedEnd,
         mode,
       };
-      await writeFile(path.join(clipDir, 'info.json'), JSON.stringify(info, null, 2));
+      await writeFile(
+        path.join(clipDir, 'info.json'),
+        JSON.stringify(info, null, 2),
+      );
       this.store.patch(job.id, { result: { clipId: job.id, videoId } });
     });
 
@@ -110,9 +128,10 @@ export class ClipsService {
     const [fileStat, media, infoRaw] = await Promise.all([
       stat(filePath),
       this.probe.probe(filePath),
-      readFile(path.join(this.config.dataDir, 'clips', clipId, 'info.json'), 'utf-8').catch(
-        () => '{}',
-      ),
+      readFile(
+        path.join(this.config.dataDir, 'clips', clipId, 'info.json'),
+        'utf-8',
+      ).catch(() => '{}'),
     ]);
     const info = JSON.parse(infoRaw) as Partial<ClipInfoFile>;
     return {

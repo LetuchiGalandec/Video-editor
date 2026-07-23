@@ -17,7 +17,8 @@ export class UploadsController {
     const job = await this.uploads.startUpload({
       clipId: typeof body?.clipId === 'string' ? body.clipId : '',
       title: typeof body?.title === 'string' ? body.title : '',
-      description: typeof body?.description === 'string' ? body.description : '',
+      description:
+        typeof body?.description === 'string' ? body.description : '',
     });
     return { jobId: job.id };
   }

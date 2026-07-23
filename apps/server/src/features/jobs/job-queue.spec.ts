@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { JobStore } from './job-store';
 import { JobQueue } from './job-queue';
 
-const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+const tick = (): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, 0));
 
 describe('JobQueue', () => {
   let store: JobStore;

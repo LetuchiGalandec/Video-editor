@@ -68,7 +68,12 @@ describe('JobStore', () => {
   it('lists all jobs and removes a job with its subject', () => {
     const a = store.create('download');
     const b = store.create('clip');
-    expect(store.list().map((j) => j.id).sort()).toEqual([a.id, b.id].sort());
+    expect(
+      store
+        .list()
+        .map((j) => j.id)
+        .sort(),
+    ).toEqual([a.id, b.id].sort());
     store.remove(a.id);
     expect(store.get(a.id)).toBeUndefined();
     expect(store.list()).toHaveLength(1);

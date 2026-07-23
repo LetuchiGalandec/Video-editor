@@ -33,7 +33,8 @@ export class JobQueue {
         this.store.patch(jobId, { state: 'done', progress: 100 });
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Unexpected error';
+        const message =
+          error instanceof Error ? error.message : 'Unexpected error';
         this.store.patch(jobId, { state: 'error', error: message });
       })
       .finally(() => {

@@ -22,7 +22,18 @@ export function buildClipArgs(input: ClipArgsInput): string[] {
   const duration = input.endSec - input.startSec;
   const codecArgs =
     input.mode === 'accurate'
-      ? ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-c:a', 'aac', '-b:a', '160k']
+      ? [
+          '-c:v',
+          'libx264',
+          '-preset',
+          'veryfast',
+          '-crf',
+          '18',
+          '-c:a',
+          'aac',
+          '-b:a',
+          '160k',
+        ]
       : ['-c', 'copy', '-avoid_negative_ts', 'make_zero'];
   return [
     '-y',

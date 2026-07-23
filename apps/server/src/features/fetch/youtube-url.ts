@@ -20,7 +20,9 @@ export function parseYoutubeVideoId(raw: string): string | null {
   }
   let url: URL;
   try {
-    url = new URL(/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`);
+    url = new URL(
+      /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`,
+    );
   } catch {
     return null;
   }

@@ -4,7 +4,8 @@ import { Observable, ReplaySubject } from 'rxjs';
 import { isTerminal } from './job.model';
 import type { Job, JobPatch, JobType } from './job.model';
 
-const clampProgress = (value: number): number => Math.min(100, Math.max(0, value));
+const clampProgress = (value: number): number =>
+  Math.min(100, Math.max(0, value));
 
 @Injectable()
 export class JobStore {
@@ -41,7 +42,11 @@ export class JobStore {
     if (!current) {
       throw new Error(`Unknown job: ${id}`);
     }
-    if (isTerminal(current.state) && patch.state && patch.state !== current.state) {
+    if (
+      isTerminal(current.state) &&
+      patch.state &&
+      patch.state !== current.state
+    ) {
       throw new Error(`Job ${id} is already ${current.state}`);
     }
     const updated: Job = {

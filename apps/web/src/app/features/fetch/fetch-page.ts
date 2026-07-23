@@ -30,7 +30,9 @@ export class FetchPage {
   });
   protected readonly errorText = computed(() => {
     const job = this.job();
-    return this.requestError() || (job?.state === 'error' ? (job.error ?? 'Something went wrong.') : '');
+    return (
+      this.requestError() || (job?.state === 'error' ? (job.error ?? 'Something went wrong.') : '')
+    );
   });
 
   constructor() {

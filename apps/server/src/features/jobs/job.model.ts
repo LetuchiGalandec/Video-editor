@@ -20,8 +20,11 @@ export interface Job {
   updatedAt: number;
 }
 
-export type JobPatch = Partial<Pick<Job, 'state' | 'progress' | 'error' | 'result'>>;
+export type JobPatch = Partial<
+  Pick<Job, 'state' | 'progress' | 'error' | 'result'>
+>;
 
 export const TERMINAL_STATES: readonly JobState[] = ['done', 'error'];
 
-export const isTerminal = (state: JobState): boolean => TERMINAL_STATES.includes(state);
+export const isTerminal = (state: JobState): boolean =>
+  TERMINAL_STATES.includes(state);

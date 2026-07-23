@@ -66,18 +66,16 @@ export class YoutubeUploadCard {
     }
     this.requestError.set('');
     this.watch()?.dispose();
-    this.api
-      .startUpload(this.clipId(), this.title().trim(), 'Clipped with Cropcorn 🍿')
-      .subscribe({
-        next: ({ jobId }) => this.watch.set(this.jobEvents.watch(jobId)),
-        error: (err: { status?: number; error?: { message?: string } }) => {
-          if (err.status === 401) {
-            this.status.set({ configured: true, authorized: false });
-            this.requestError.set('Google session expired — connect again.');
-          } else {
-            this.requestError.set(err.error?.message ?? 'Could not start the upload.');
-          }
-        },
-      });
+    this.api.startUpload(this.clipId(), this.title().trim(), 'Clipped with Cropcorn 🍿').subscribe({
+      next: ({ jobId }) => this.watch.set(this.jobEvents.watch(jobId)),
+      error: (err: { status?: number; error?: { message?: string } }) => {
+        if (err.status === 401) {
+          this.status.set({ configured: true, authorized: false });
+          this.requestError.set('Google session expired — connect again.');
+        } else {
+          this.requestError.set(err.error?.message ?? 'Could not start the upload.');
+        }
+      },
+    });
   }
 }

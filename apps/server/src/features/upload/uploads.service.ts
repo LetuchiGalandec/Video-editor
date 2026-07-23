@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ClipsService } from '../clips/clips.service';
 import { JobQueue } from '../jobs/job-queue';
 import { JobStore } from '../jobs/job-store';

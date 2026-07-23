@@ -41,7 +41,9 @@ export class CleanupService implements OnModuleInit, OnModuleDestroy {
 
     for (const kind of DATA_KINDS) {
       const baseDir = path.join(this.config.dataDir, kind);
-      const entries = await readdir(baseDir, { withFileTypes: true }).catch(() => []);
+      const entries = await readdir(baseDir, { withFileTypes: true }).catch(
+        () => [],
+      );
       for (const entry of entries) {
         if (!entry.isDirectory()) {
           continue;

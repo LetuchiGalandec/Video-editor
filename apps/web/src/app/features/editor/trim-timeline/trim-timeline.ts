@@ -1,10 +1,6 @@
 import { Component, ElementRef, computed, input, model, output, viewChild } from '@angular/core';
 import { secondsToTimestamp } from '../../../core/time-format';
-import {
-  clampMarker,
-  clientXToSeconds,
-  keyboardStep,
-} from './trim-timeline-math';
+import { clampMarker, clientXToSeconds, keyboardStep } from './trim-timeline-math';
 import type { MarkerKind, TrackRect } from './trim-timeline-math';
 
 /**

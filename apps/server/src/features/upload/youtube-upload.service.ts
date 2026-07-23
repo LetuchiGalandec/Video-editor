@@ -22,7 +22,10 @@ export class YoutubeUploadService {
   constructor(private readonly auth: GoogleAuthService) {}
 
   /** Resumable upload of the clip as a PRIVATE video on the user's channel. */
-  async upload(input: UploadInput, onProgress: (percent: number) => void): Promise<UploadOutput> {
+  async upload(
+    input: UploadInput,
+    onProgress: (percent: number) => void,
+  ): Promise<UploadOutput> {
     const client = await this.auth.authorizedClient();
     if (!client) {
       throw new UnauthorizedException('Connect your Google account first.');

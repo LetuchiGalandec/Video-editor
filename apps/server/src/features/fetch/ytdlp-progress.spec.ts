@@ -3,14 +3,22 @@ import { parseProgressLine, DownloadProgressTracker } from './ytdlp-progress';
 
 describe('parseProgressLine', () => {
   it('parses the percent from a CROPCORN template line', () => {
-    expect(parseProgressLine('download:CROPCORN|  1.2%|12345|9999999')).toBeCloseTo(1.2);
-    expect(parseProgressLine('download:CROPCORN|100.0%|9999999|9999999')).toBeCloseTo(100);
+    expect(
+      parseProgressLine('download:CROPCORN|  1.2%|12345|9999999'),
+    ).toBeCloseTo(1.2);
+    expect(
+      parseProgressLine('download:CROPCORN|100.0%|9999999|9999999'),
+    ).toBeCloseTo(100);
     expect(parseProgressLine('download:CROPCORN|  0.0%|0|NA')).toBeCloseTo(0);
   });
 
   it('returns null for non-progress lines', () => {
-    expect(parseProgressLine('[youtube] dQw4w9WgXcQ: Downloading webpage')).toBeNull();
-    expect(parseProgressLine('[Merger] Merging formats into "source.mp4"')).toBeNull();
+    expect(
+      parseProgressLine('[youtube] dQw4w9WgXcQ: Downloading webpage'),
+    ).toBeNull();
+    expect(
+      parseProgressLine('[Merger] Merging formats into "source.mp4"'),
+    ).toBeNull();
     expect(parseProgressLine('')).toBeNull();
     expect(parseProgressLine('download:CROPCORN|garbage|x|y')).toBeNull();
   });

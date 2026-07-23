@@ -9,7 +9,14 @@ import { UploadModule } from './features/upload/upload.module';
 import { VideosModule } from './features/videos/videos.module';
 
 @Module({
-  imports: [ConfigModule, JobsModule, FetchModule, VideosModule, ClipsModule, UploadModule],
+  imports: [
+    ConfigModule,
+    JobsModule,
+    FetchModule,
+    VideosModule,
+    ClipsModule,
+    UploadModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

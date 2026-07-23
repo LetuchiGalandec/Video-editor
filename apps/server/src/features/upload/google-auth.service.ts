@@ -34,7 +34,9 @@ export class GoogleAuthService {
   }
 
   get configured(): boolean {
-    return this.config.googleClientId !== '' && this.config.googleClientSecret !== '';
+    return (
+      this.config.googleClientId !== '' && this.config.googleClientSecret !== ''
+    );
   }
 
   authUrl(state: string): string {

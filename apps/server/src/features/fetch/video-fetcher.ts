@@ -34,7 +34,11 @@ export class FetchError extends Error {
  */
 export interface VideoFetcher {
   probe(url: string): Promise<VideoProbe>;
-  download(url: string, destDir: string, onProgress: (percent: number) => void): Promise<FetchedVideo>;
+  download(
+    url: string,
+    destDir: string,
+    onProgress: (percent: number) => void,
+  ): Promise<FetchedVideo>;
 }
 
 export const VIDEO_FETCHER = 'VIDEO_FETCHER';

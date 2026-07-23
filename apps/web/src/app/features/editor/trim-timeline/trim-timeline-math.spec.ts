@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { clientXToSeconds, clampMarker, keyboardStep, MIN_MARKER_GAP_SEC } from './trim-timeline-math';
+import {
+  clientXToSeconds,
+  clampMarker,
+  keyboardStep,
+  MIN_MARKER_GAP_SEC,
+} from './trim-timeline-math';
 
 const rect = { left: 100, width: 400 };
 

@@ -13,7 +13,11 @@ describe('CleanupService', () => {
   let store: JobStore;
   let service: CleanupService;
 
-  const makeDir = async (kind: 'videos' | 'clips', name: string, ageMs: number): Promise<string> => {
+  const makeDir = async (
+    kind: 'videos' | 'clips',
+    name: string,
+    ageMs: number,
+  ): Promise<string> => {
     const dir = path.join(dataDir, kind, name);
     await mkdir(dir, { recursive: true });
     await writeFile(path.join(dir, 'file.mp4'), 'x');
