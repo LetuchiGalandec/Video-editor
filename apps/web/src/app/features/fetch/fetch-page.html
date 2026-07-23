@@ -1,0 +1,45 @@
+<section class="hero">
+  <div class="hero-copy">
+    <h1 class="headline">
+      Crop the <span class="butter-word">good&nbsp;part</span>.
+    </h1>
+    <p class="lede">
+      Paste a YouTube link, trim exactly the seconds you want, then download the
+      clip — or tuck it into your channel as a Private video.
+    </p>
+  </div>
+
+  <form class="ticket" (submit)="$event.preventDefault(); submit()">
+    <label class="ticket-label" for="yt-url">YouTube link</label>
+    <div class="ticket-row">
+      <input
+        id="yt-url"
+        class="ticket-input"
+        type="url"
+        placeholder="https://www.youtube.com/watch?v=…"
+        autocomplete="off"
+        spellcheck="false"
+        [value]="url()"
+        (input)="onInput($any($event.target).value)"
+        [disabled]="busy()"
+      />
+      <button class="btn btn-butter" type="submit" [disabled]="!isValidUrl() || busy()">
+        {{ busy() ? 'Fetching…' : 'Fetch it' }} <span aria-hidden="true">🍿</span>
+      </button>
+    </div>
+    @if (url() && !isValidUrl() && !busy()) {
+      <p class="hint">Hmm, that doesn't look like a YouTube video link yet.</p>
+    }
+  </form>
+
+  @if (job(); as j) {
+    <app-download-progress [job]="j" />
+  }
+
+  @if (errorText()) {
+    <div class="error-banner" role="alert">
+      <strong>Un-poppable.</strong>
+      <span>{{ errorText() }}</span>
+    </div>
+  }
+</section>

@@ -1,0 +1,21 @@
+@if (store.meta(); as meta) {
+  <section class="editor">
+    <header class="editor-head">
+      <h2 class="video-title">{{ meta.title }}</h2>
+      <span class="video-facts">{{ meta.width }}×{{ meta.height }}</span>
+    </header>
+
+    <app-video-player #player [src]="streamUrl()" />
+
+    <app-controls-bar
+      (togglePlay)="player.toggle()"
+      (toggleMute)="player.toggleMute()"
+      (volumeChange)="player.setVolume($event)"
+    />
+  </section>
+} @else {
+  <div class="loading" role="status">
+    <span class="kernel-spin" aria-hidden="true">🍿</span>
+    <p>Warming up the projector…</p>
+  </div>
+}

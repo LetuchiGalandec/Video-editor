@@ -1,1 +1,162 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@fontsource-variable/fredoka';
+
+/* ── Cropcorn design tokens ─────────────────────────────────────────── */
+:root {
+  /* palette: warm dark theater + butter */
+  --color-bg: oklch(16% 0.015 70);
+  --color-bg-glow: oklch(24% 0.035 78);
+  --color-surface: oklch(22% 0.02 72);
+  --color-surface-raised: oklch(26% 0.025 75);
+  --color-edge: oklch(34% 0.035 80);
+  --color-text: oklch(94% 0.03 90);
+  --color-text-dim: oklch(69% 0.03 85);
+  --color-butter: oklch(86% 0.15 92);
+  --color-butter-deep: oklch(76% 0.15 82);
+  --color-butter-ink: oklch(28% 0.06 80);
+  --color-error: oklch(66% 0.19 30);
+  --color-ok: oklch(78% 0.14 150);
+
+  --font-display: 'Fredoka Variable', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --text-base: clamp(0.95rem, 0.9rem + 0.25vw, 1.05rem);
+  --text-hero: clamp(2.4rem, 1.4rem + 4.5vw, 4.6rem);
+
+  --radius-lg: 22px;
+  --radius-md: 13px;
+  --radius-sm: 8px;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.75rem;
+  --space-5: 3rem;
+
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow-pop: 0 10px 34px oklch(8% 0.02 70 / 0.55);
+  --glow-butter: 0 0 22px oklch(86% 0.15 92 / 0.28);
+
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  /* warm marquee glow from the top + faint grain */
+  background-image:
+    radial-gradient(90rem 44rem at 50% -18rem, var(--color-bg-glow), transparent 65%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+a {
+  color: var(--color-butter);
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-butter);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── shared components ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: 0.72em 1.4em;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.btn-butter {
+  background: linear-gradient(180deg, var(--color-butter), var(--color-butter-deep));
+  color: var(--color-butter-ink);
+  box-shadow: var(--shadow-pop);
+}
+
+.btn-butter:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-pop), var(--glow-butter);
+}
+
+.btn-butter:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text);
+  border: 1.5px solid var(--color-edge);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--color-butter);
+  color: var(--color-butter);
+}
+
+.error-banner {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  border: 1.5px solid oklch(from var(--color-error) l c h / 0.5);
+  background: oklch(from var(--color-error) 24% 0.07 h / 0.35);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

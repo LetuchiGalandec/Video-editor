@@ -1,0 +1,16 @@
+<div class="progress-card" role="status" aria-live="polite">
+  <div class="progress-head">
+    <span class="stage">{{ label() }}</span>
+    <span class="percent">{{ percent() }}%</span>
+  </div>
+  <div
+    class="bar"
+    role="progressbar"
+    [attr.aria-valuenow]="percent()"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
+    <div class="fill" [style.width.%]="percent()"></div>
+    <span class="bar-kernel" [style.left.%]="percent()" aria-hidden="true">🍿</span>
+  </div>
+</div>

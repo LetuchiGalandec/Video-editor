@@ -1,0 +1,14 @@
+<div class="screen">
+  <video
+    #vid
+    [src]="src()"
+    preload="metadata"
+    playsinline
+    (loadedmetadata)="onLoadedMetadata()"
+    (timeupdate)="onTimeUpdate()"
+    (play)="store.playing.set(true)"
+    (pause)="store.playing.set(false)"
+    (volumechange)="onVolumeChange()"
+    (click)="toggle()"
+  ></video>
+</div>
