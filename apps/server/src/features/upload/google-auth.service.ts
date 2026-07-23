@@ -2,7 +2,12 @@ import { readFile, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { Inject, Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
-import type { Credentials, OAuth2Client } from 'google-auth-library';
+
+// Derive the types from the constructor googleapis actually uses — two copies
+// of google-auth-library exist in node_modules with incompatible declarations,
+// so importing the type from either package directly can mismatch the runtime.
+export type OAuth2Client = InstanceType<typeof google.auth.OAuth2>;
+type Credentials = OAuth2Client['credentials'];
 import { APP_CONFIG } from '../../config/config';
 import type { AppConfig } from '../../config/config';
 
@@ -80,14 +85,15 @@ export class GoogleAuthService {
 
   private oauth2(): OAuth2Client {
     if (!this.client) {
-      this.client = new google.auth.OAuth2(
+      const client = new google.auth.OAuth2(
         this.config.googleClientId,
         this.config.googleClientSecret,
         this.config.oauthRedirectUri,
       );
-      this.client.on('tokens', (tokens) => {
-        void this.persist({ ...this.client?.credentials, ...tokens });
+      client.on('tokens', (tokens) => {
+        void this.persist({ ...client.credentials, ...tokens });
       });
+      this.client = client;
     }
     return this.client;
   }

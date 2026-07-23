@@ -7,6 +7,7 @@ dist/
 
 # Runtime data (videos, clips, tokens)
 .data/
+.data-e2e/
 
 # Environment
 .env
