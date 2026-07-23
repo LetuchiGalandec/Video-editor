@@ -90,7 +90,9 @@ describe('YoutubeUploadCard', () => {
 
   it('reveals a name field only when "create new playlist" is chosen', async () => {
     await render();
-    expect(fixture.nativeElement.querySelector('input[placeholder="New playlist name"]')).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('input[placeholder="New playlist name"]'),
+    ).toBeNull();
     const component = fixture.componentInstance as unknown as {
       selectedPlaylist: { set: (v: string) => void };
     };

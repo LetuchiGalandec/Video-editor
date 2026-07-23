@@ -13,6 +13,7 @@ export interface AppConfig {
   webOrigin: string;
   ytCookiesFromBrowser: string;
   ytCookiesFile: string;
+  ytMaxHeight: number;
   sessionSecret: string;
 }
 
@@ -49,6 +50,8 @@ export function loadConfig(): AppConfig {
     webOrigin: process.env.WEB_ORIGIN ?? 'http://localhost:4200',
     ytCookiesFromBrowser: process.env.YT_COOKIES_FROM_BROWSER ?? '',
     ytCookiesFile: process.env.YT_COOKIES_FILE ?? '',
-    sessionSecret: process.env.SESSION_SECRET ?? 'cropcorn-local-dev-session-secret',
+    ytMaxHeight: intFromEnv(process.env.YT_MAX_HEIGHT, 1080),
+    sessionSecret:
+      process.env.SESSION_SECRET ?? 'cropcorn-local-dev-session-secret',
   };
 }

@@ -32,7 +32,8 @@ export class SessionService {
 
   /** Reads the session id without creating one. */
   peek(req: Request): string | undefined {
-    const value = req.signedCookies?.[COOKIE_NAME] ?? req.cookies?.[COOKIE_NAME];
+    const value =
+      req.signedCookies?.[COOKIE_NAME] ?? req.cookies?.[COOKIE_NAME];
     return typeof value === 'string' ? value : undefined;
   }
 

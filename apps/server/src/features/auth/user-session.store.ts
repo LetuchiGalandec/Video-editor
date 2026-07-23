@@ -83,6 +83,8 @@ export class UserSessionStore {
 
   private persist(): void {
     mkdirSync(path.dirname(this.filePath), { recursive: true });
-    writeFileSync(this.filePath, JSON.stringify(this.data, null, 2), { mode: FILE_MODE });
+    writeFileSync(this.filePath, JSON.stringify(this.data, null, 2), {
+      mode: FILE_MODE,
+    });
   }
 }

@@ -1,4 +1,6 @@
-const PROGRESS_LINE = /^download:CROPCORN\|\s*([\d.]+)%\|/;
+// yt-dlp consumes the leading `download:` of the template as a progress-type
+// SELECTOR and does not print it, so the emitted line starts with `CROPCORN|`.
+const PROGRESS_LINE = /^CROPCORN\|\s*([\d.]+)%\|/;
 
 /** The `--progress-template` value that produces lines parseProgressLine understands. */
 export const PROGRESS_TEMPLATE =

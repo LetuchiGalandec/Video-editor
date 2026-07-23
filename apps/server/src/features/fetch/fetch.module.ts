@@ -21,6 +21,7 @@ import { YtDlpFetcher } from './yt-dlp.fetcher';
           : new YtDlpFetcher({
               cookiesFromBrowser: config.ytCookiesFromBrowser,
               cookiesFile: config.ytCookiesFile,
+              maxHeight: config.ytMaxHeight,
             }),
       inject: [APP_CONFIG],
     },

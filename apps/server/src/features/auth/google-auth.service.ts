@@ -39,7 +39,9 @@ export class GoogleAuthService {
   ) {}
 
   get configured(): boolean {
-    return this.config.googleClientId !== '' && this.config.googleClientSecret !== '';
+    return (
+      this.config.googleClientId !== '' && this.config.googleClientSecret !== ''
+    );
   }
 
   authUrl(state: string): string {
@@ -58,7 +60,10 @@ export class GoogleAuthService {
     client.setCredentials(tokens);
 
     const youtube = google.youtube({ version: 'v3', auth: client });
-    const channels = await youtube.channels.list({ part: ['snippet'], mine: true });
+    const channels = await youtube.channels.list({
+      part: ['snippet'],
+      mine: true,
+    });
     const channel = channels.data.items?.[0];
     const userId = channel?.id ?? `unknown-${sessionId}`;
     const name = channel?.snippet?.title ?? 'YouTube account';
@@ -105,7 +110,10 @@ export class GoogleAuthService {
     client.setCredentials(user.tokens as Credentials);
     client.on('tokens', (rotated) => {
       const current = this.store.getUser(userId);
-      this.store.updateTokens(userId, { ...(current?.tokens ?? {}), ...rotated });
+      this.store.updateTokens(userId, {
+        ...(current?.tokens ?? {}),
+        ...rotated,
+      });
     });
     return client;
   }

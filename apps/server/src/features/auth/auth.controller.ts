@@ -41,7 +41,9 @@ export class AuthController {
     // Establish (or reuse) this browser's session before leaving for Google, so
     // the cookie is the same one presented on the callback and later requests.
     this.session.getOrCreate(req, res);
-    const state = SAFE_RETURN_PATH.test(returnPath ?? '') ? (returnPath as string) : '/';
+    const state = SAFE_RETURN_PATH.test(returnPath ?? '')
+      ? (returnPath as string)
+      : '/';
     res.redirect(this.auth.authUrl(state));
   }
 
@@ -52,7 +54,9 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    const returnPath = SAFE_RETURN_PATH.test(state ?? '') ? (state as string) : '/';
+    const returnPath = SAFE_RETURN_PATH.test(state ?? '')
+      ? (state as string)
+      : '/';
     const sessionId = this.session.getOrCreate(req, res);
     if (!code) {
       res.redirect(`${this.config.webOrigin}${returnPath}?auth=denied`);
@@ -66,14 +70,20 @@ export class AuthController {
   status(@Req() req: Request): Promise<AuthStatus> {
     const sessionId = this.session.peek(req);
     if (!sessionId) {
-      return Promise.resolve({ configured: this.auth.configured, authorized: false });
+      return Promise.resolve({
+        configured: this.auth.configured,
+        authorized: false,
+      });
     }
     return this.auth.statusForSession(sessionId);
   }
 
   @Post('signout')
   @HttpCode(204)
-  signOut(@Req() req: Request, @Res({ passthrough: true }) res: Response): void {
+  signOut(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): void {
     const sessionId = this.session.peek(req);
     if (sessionId) {
       this.auth.signOut(sessionId);

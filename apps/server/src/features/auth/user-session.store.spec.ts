@@ -19,7 +19,11 @@ describe('UserSessionStore', () => {
 
   it('links a session to a user and resolves the user back', () => {
     const store = new UserSessionStore(filePath);
-    store.upsertUser({ userId: 'u1', name: 'Alice TV', tokens: { refresh_token: 'r1' } });
+    store.upsertUser({
+      userId: 'u1',
+      name: 'Alice TV',
+      tokens: { refresh_token: 'r1' },
+    });
     store.linkSession('sid-1', 'u1');
 
     expect(store.userIdForSession('sid-1')).toBe('u1');
@@ -28,8 +32,16 @@ describe('UserSessionStore', () => {
 
   it('keeps sessions isolated between users', () => {
     const store = new UserSessionStore(filePath);
-    store.upsertUser({ userId: 'u1', name: 'Alice', tokens: { refresh_token: 'a' } });
-    store.upsertUser({ userId: 'u2', name: 'Bob', tokens: { refresh_token: 'b' } });
+    store.upsertUser({
+      userId: 'u1',
+      name: 'Alice',
+      tokens: { refresh_token: 'a' },
+    });
+    store.upsertUser({
+      userId: 'u2',
+      name: 'Bob',
+      tokens: { refresh_token: 'b' },
+    });
     store.linkSession('sid-a', 'u1');
     store.linkSession('sid-b', 'u2');
 
@@ -39,16 +51,26 @@ describe('UserSessionStore', () => {
 
   it('persists across reloads (tokens survive a restart)', () => {
     const first = new UserSessionStore(filePath);
-    first.upsertUser({ userId: 'u1', name: 'Alice', tokens: { refresh_token: 'r1' } });
+    first.upsertUser({
+      userId: 'u1',
+      name: 'Alice',
+      tokens: { refresh_token: 'r1' },
+    });
     first.linkSession('sid-1', 'u1');
 
     const reloaded = new UserSessionStore(filePath);
-    expect(reloaded.getUserBySession('sid-1')?.tokens).toEqual({ refresh_token: 'r1' });
+    expect(reloaded.getUserBySession('sid-1')?.tokens).toEqual({
+      refresh_token: 'r1',
+    });
   });
 
   it('updates tokens for a user without disturbing the session link', () => {
     const store = new UserSessionStore(filePath);
-    store.upsertUser({ userId: 'u1', name: 'Alice', tokens: { refresh_token: 'r1' } });
+    store.upsertUser({
+      userId: 'u1',
+      name: 'Alice',
+      tokens: { refresh_token: 'r1' },
+    });
     store.linkSession('sid-1', 'u1');
 
     store.updateTokens('u1', { refresh_token: 'r1', access_token: 'a2' });
@@ -60,7 +82,11 @@ describe('UserSessionStore', () => {
 
   it('unlinks a session on sign out but keeps the stored user', () => {
     const store = new UserSessionStore(filePath);
-    store.upsertUser({ userId: 'u1', name: 'Alice', tokens: { refresh_token: 'r1' } });
+    store.upsertUser({
+      userId: 'u1',
+      name: 'Alice',
+      tokens: { refresh_token: 'r1' },
+    });
     store.linkSession('sid-1', 'u1');
 
     store.unlinkSession('sid-1');
