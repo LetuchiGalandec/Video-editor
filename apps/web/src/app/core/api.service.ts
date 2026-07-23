@@ -30,4 +30,17 @@ export class ApiService {
   clipFileUrl(clipId: string): string {
     return `/api/clips/${clipId}/file`;
   }
+
+  authStatus(): Observable<AuthStatus> {
+    return this.http.get<AuthStatus>('/api/auth/status');
+  }
+
+  startUpload(clipId: string, title: string, description: string): Observable<{ jobId: string }> {
+    return this.http.post<{ jobId: string }>('/api/uploads', { clipId, title, description });
+  }
+}
+
+export interface AuthStatus {
+  configured: boolean;
+  authorized: boolean;
 }

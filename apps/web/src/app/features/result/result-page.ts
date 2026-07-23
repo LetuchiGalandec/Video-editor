@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ApiService } from '../../core/api.service';
 import { secondsToTimestamp } from '../../core/time-format';
+import { YoutubeUploadCard } from './youtube-upload-card';
 
 export interface ClipMetaResponse {
   clipId: string;
@@ -19,7 +20,7 @@ const BYTES_PER_MB = 1024 * 1024;
 
 @Component({
   selector: 'app-result-page',
-  imports: [RouterLink],
+  imports: [RouterLink, YoutubeUploadCard],
   templateUrl: './result-page.html',
   styleUrl: './result-page.scss',
 })

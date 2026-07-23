@@ -18,9 +18,7 @@
       <a class="btn btn-ghost" routerLink="/">New video</a>
     </div>
 
-    <div class="upload-slot">
-      <!-- YouTube upload card lands here in the next phase -->
-    </div>
+    <app-youtube-upload-card [clipId]="m.clipId" [defaultTitle]="m.title" />
   </section>
 } @else {
   <div class="loading" role="status">
