@@ -1,8 +1,8 @@
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
-import { GoogleAuthService } from './google-auth.service';
+import type { OAuth2Client } from '../auth/google-auth.service';
 
 export interface UploadInput {
   filePath: string;
@@ -19,17 +19,12 @@ const CATEGORY_PEOPLE_AND_BLOGS = '22';
 
 @Injectable()
 export class YoutubeUploadService {
-  constructor(private readonly auth: GoogleAuthService) {}
-
-  /** Resumable upload of the clip as a PRIVATE video on the user's channel. */
+  /** Resumable upload of the clip as a PRIVATE video on the signed-in channel. */
   async upload(
+    client: OAuth2Client,
     input: UploadInput,
     onProgress: (percent: number) => void,
   ): Promise<UploadOutput> {
-    const client = await this.auth.authorizedClient();
-    if (!client) {
-      throw new UnauthorizedException('Connect your Google account first.');
-    }
     const { size } = await stat(input.filePath);
     const youtube = google.youtube({ version: 'v3', auth: client });
     const response = await youtube.videos.insert(

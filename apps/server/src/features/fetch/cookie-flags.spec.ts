@@ -3,7 +3,12 @@ import { buildCookieFlags } from './cookie-flags';
 
 describe('buildCookieFlags', () => {
   it('prefers a browser cookie source when set', () => {
-    expect(buildCookieFlags({ cookiesFromBrowser: 'chrome', cookiesFile: '/tmp/c.txt' })).toEqual({
+    expect(
+      buildCookieFlags({
+        cookiesFromBrowser: 'chrome',
+        cookiesFile: '/tmp/c.txt',
+      }),
+    ).toEqual({
       cookiesFromBrowser: 'chrome',
     });
   });
@@ -22,6 +27,8 @@ describe('buildCookieFlags', () => {
 
   it('returns no flags when neither source is configured', () => {
     expect(buildCookieFlags({})).toEqual({});
-    expect(buildCookieFlags({ cookiesFromBrowser: '', cookiesFile: '' })).toEqual({});
+    expect(
+      buildCookieFlags({ cookiesFromBrowser: '', cookiesFile: '' }),
+    ).toEqual({});
   });
 });
