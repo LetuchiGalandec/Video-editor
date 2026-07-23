@@ -1,0 +1,30 @@
+@if (meta(); as m) {
+  <section class="result">
+    <header class="result-head">
+      <p class="eyebrow">Fresh out of the popper</p>
+      <h2 class="clip-title">{{ m.title }}</h2>
+      <p class="facts">{{ factsLine() }}</p>
+    </header>
+
+    <div class="clip-screen">
+      <video [src]="streamUrl()" controls playsinline preload="metadata"></video>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-butter" [href]="downloadUrl()" download>
+        Download .mp4 <span aria-hidden="true">⬇︎</span>
+      </a>
+      <a class="btn btn-ghost" [routerLink]="editUrl()">Trim again</a>
+      <a class="btn btn-ghost" routerLink="/">New video</a>
+    </div>
+
+    <div class="upload-slot">
+      <!-- YouTube upload card lands here in the next phase -->
+    </div>
+  </section>
+} @else {
+  <div class="loading" role="status">
+    <span aria-hidden="true">🍿</span>
+    <p>Plating your clip…</p>
+  </div>
+}

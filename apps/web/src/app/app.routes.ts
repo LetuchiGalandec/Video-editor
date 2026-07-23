@@ -9,5 +9,9 @@ export const routes: Routes = [
     path: 'edit/:videoId',
     loadComponent: () => import('./features/editor/editor-page').then((m) => m.EditorPage),
   },
+  {
+    path: 'result/:clipId',
+    loadComponent: () => import('./features/result/result-page').then((m) => m.ResultPage),
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -23,6 +23,53 @@
       />
       <app-marker-inputs />
     </div>
+
+    <div class="generate-row">
+      <div class="mode-toggle" role="radiogroup" aria-label="Cut precision">
+        <button
+          type="button"
+          class="mode-option"
+          role="radio"
+          [attr.aria-checked]="store.mode() === 'accurate'"
+          [class.active]="store.mode() === 'accurate'"
+          (click)="setMode('accurate')"
+        >
+          <span class="mode-name">Frame-accurate</span>
+          <span class="mode-hint">re-encodes for an exact cut</span>
+        </button>
+        <button
+          type="button"
+          class="mode-option"
+          role="radio"
+          [attr.aria-checked]="store.mode() === 'fast'"
+          [class.active]="store.mode() === 'fast'"
+          (click)="setMode('fast')"
+        >
+          <span class="mode-name">Fast cut</span>
+          <span class="mode-hint">instant, snaps to keyframes (± a few sec)</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-butter generate-btn"
+        [disabled]="!store.canGenerate() || generating()"
+        (click)="generate()"
+      >
+        {{ generating() ? 'Slicing…' : 'Generate clip' }} <span aria-hidden="true">✂️</span>
+      </button>
+    </div>
+
+    @if (clipJob(); as j) {
+      <app-progress-card [job]="j" />
+    }
+
+    @if (errorText()) {
+      <div class="error-banner" role="alert">
+        <strong>Un-poppable.</strong>
+        <span>{{ errorText() }}</span>
+      </div>
+    }
   </section>
 } @else {
   <div class="loading" role="status">

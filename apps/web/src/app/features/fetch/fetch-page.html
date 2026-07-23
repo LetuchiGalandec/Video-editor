@@ -33,7 +33,7 @@
   </form>
 
   @if (job(); as j) {
-    <app-download-progress [job]="j" />
+    <app-progress-card [job]="j" />
   }
 
   @if (errorText()) {

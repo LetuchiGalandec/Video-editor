@@ -5,11 +5,11 @@ import { JobEventsService } from '../../core/job-events.service';
 import type { JobWatch } from '../../core/job-events.service';
 import { isTerminal } from '../../core/api.models';
 import { isYoutubeVideoUrl } from '../../core/youtube-link';
-import { DownloadProgress } from './download-progress';
+import { ProgressCard } from '../../shared/progress-card';
 
 @Component({
   selector: 'app-fetch-page',
-  imports: [DownloadProgress],
+  imports: [ProgressCard],
   templateUrl: './fetch-page.html',
   styleUrl: './fetch-page.scss',
 })

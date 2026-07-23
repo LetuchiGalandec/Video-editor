@@ -36,6 +36,70 @@
   padding: var(--space-3);
 }
 
+.generate-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--color-edge);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex: 1;
+  min-width: 20rem;
+}
+
+.mode-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  padding: 0.6em 1em;
+  background: transparent;
+  border: 0;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+
+  & + & {
+    border-left: 1.5px solid var(--color-edge);
+  }
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &.active {
+    background: oklch(86% 0.15 92 / 0.12);
+    color: var(--color-text);
+    box-shadow: inset 0 0 0 1.5px var(--color-butter);
+  }
+}
+
+.mode-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mode-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+}
+
+.generate-btn {
+  min-width: 12rem;
+  justify-content: center;
+}
+
 .loading {
   flex: 1;
   display: flex;
