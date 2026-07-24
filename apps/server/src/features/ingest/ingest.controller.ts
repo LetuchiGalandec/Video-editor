@@ -4,15 +4,16 @@ import {
   HttpCode,
   Post,
   UploadedFile,
-  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IngestService } from './ingest.service';
-import { MulterErrorFilter } from './multer-error.filter';
 
+// No custom exception filter needed here: FileInterceptor already runs
+// multer's errors through Nest's transformException(), which maps
+// LIMIT_FILE_SIZE -> PayloadTooLargeException (413) and every other
+// MulterError -> BadRequestException (400) before it ever reaches a filter.
 @Controller('videos')
-@UseFilters(MulterErrorFilter)
 export class IngestController {
   constructor(private readonly ingest: IngestService) {}
 
