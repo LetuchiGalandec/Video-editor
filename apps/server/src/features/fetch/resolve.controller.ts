@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Inject,
+  NotFoundException,
+  Post,
+} from '@nestjs/common';
+import { APP_CONFIG } from '../../config/config';
+import type { AppConfig } from '../../config/config';
 import { DownloadsService } from './downloads.service';
 import type { ResolveResult } from './downloads.service';
 
@@ -8,11 +17,17 @@ interface ResolveDto {
 
 @Controller('resolve')
 export class ResolveController {
-  constructor(private readonly downloads: DownloadsService) {}
+  constructor(
+    private readonly downloads: DownloadsService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
+  ) {}
 
   @Post()
   @HttpCode(200)
-  resolve(@Body() body: ResolveDto): Promise<ResolveResult> {
+  async resolve(@Body() body: ResolveDto): Promise<ResolveResult> {
+    if (!this.config.youtubeEnabled) {
+      throw new NotFoundException('YouTube fetching is disabled.');
+    }
     const url = typeof body?.url === 'string' ? body.url : '';
     return this.downloads.resolve(url);
   }
