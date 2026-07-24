@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { retry } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { JobEventsService } from '../../core/job-events.service';
 import type { JobWatch } from '../../core/job-events.service';
@@ -9,6 +10,11 @@ import { ProgressCard } from '../../shared/progress-card';
 
 type FetchMode = 'quick' | 'precise';
 type Source = 'youtube' | 'upload';
+
+// /api/config can momentarily 502/ECONNREFUSED if the page load beats the
+// server's boot; retry briefly instead of stranding on stale defaults.
+const CONFIG_RETRY_COUNT = 3;
+const CONFIG_RETRY_DELAY_MS = 500;
 
 @Component({
   selector: 'app-fetch-page',
@@ -50,14 +56,22 @@ export class FetchPage {
   });
 
   constructor() {
-    this.api.getConfig().subscribe({
-      next: (config) => {
-        this.youtubeEnabled.set(config.youtubeEnabled);
-        this.maxUploadBytes.set(config.maxUploadBytes);
-        this.source.set(config.youtubeEnabled ? 'youtube' : 'upload');
-      },
-      error: () => undefined,
-    });
+    // /api/config decides which sources are offered. Retry a few times so a page
+    // load that races the server's boot recovers instead of stranding on stale
+    // defaults, and surface (never silently swallow) a genuine failure.
+    this.api
+      .getConfig()
+      .pipe(retry({ count: CONFIG_RETRY_COUNT, delay: CONFIG_RETRY_DELAY_MS }))
+      .subscribe({
+        next: (config) => {
+          this.youtubeEnabled.set(config.youtubeEnabled);
+          this.maxUploadBytes.set(config.maxUploadBytes);
+          this.source.set(config.youtubeEnabled ? 'youtube' : 'upload');
+        },
+        error: (err: unknown) => {
+          console.error('Cropcorn: /api/config failed to load; keeping default flags.', err);
+        },
+      });
 
     // Both the full-download job and the ingest job report result.videoId when
     // done — either way, head to the native editor.
