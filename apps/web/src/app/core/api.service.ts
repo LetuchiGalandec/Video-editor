@@ -38,8 +38,7 @@ export interface PublicConfig {
 }
 
 export type UploadEvent =
-  | { kind: 'progress'; percent: number }
-  | { kind: 'uploaded'; jobId: string };
+  { kind: 'progress'; percent: number } | { kind: 'uploaded'; jobId: string };
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -146,9 +145,7 @@ export class ApiService {
     return this.http.request<{ jobId: string }>(req).pipe(
       map((event): UploadEvent | null => {
         if (event.type === HttpEventType.UploadProgress) {
-          const percent = event.total
-            ? Math.round((event.loaded / event.total) * 100)
-            : 0;
+          const percent = event.total ? Math.round((event.loaded / event.total) * 100) : 0;
           return { kind: 'progress', percent };
         }
         if (event instanceof HttpResponse) {
