@@ -15,6 +15,9 @@ export interface AppConfig {
   ytCookiesFile: string;
   ytMaxHeight: number;
   sessionSecret: string;
+  maxUploadBytes: number;
+  maxUploadDurationSec: number;
+  youtubeEnabled: boolean;
 }
 
 export const APP_CONFIG = 'APP_CONFIG';
@@ -26,6 +29,8 @@ const intFromEnv = (value: string | undefined, fallback: number): number => {
 
 const FOUR_HOURS_SEC = 4 * 60 * 60;
 const SIX_HOURS_MIN = 6 * 60;
+const TWO_GIB = 2147483648;
+const TWO_HOURS_SEC = 2 * 60 * 60;
 
 // Anchor defaults to this file's location (src/config or dist/config), not the
 // process cwd, so the server behaves the same however it is launched.
@@ -53,5 +58,11 @@ export function loadConfig(): AppConfig {
     ytMaxHeight: intFromEnv(process.env.YT_MAX_HEIGHT, 1080),
     sessionSecret:
       process.env.SESSION_SECRET ?? 'cropcorn-local-dev-session-secret',
+    maxUploadBytes: intFromEnv(process.env.MAX_UPLOAD_BYTES, TWO_GIB),
+    maxUploadDurationSec: intFromEnv(
+      process.env.MAX_UPLOAD_DURATION_SEC,
+      TWO_HOURS_SEC,
+    ),
+    youtubeEnabled: process.env.YOUTUBE_ENABLED !== 'false',
   };
 }
