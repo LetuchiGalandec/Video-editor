@@ -1,0 +1,9 @@
+<div class="frame">
+  <youtube-player
+    [videoId]="videoId()"
+    [playerVars]="playerVars"
+    [disablePlaceholder]="true"
+    (ready)="onReady()"
+    (stateChange)="onStateChange($event)"
+  />
+</div>

@@ -1,14 +1,22 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // Runs fully offline: the server is started with FETCHER=fake, which copies
-// fixtures/sample.mp4 (4s testsrc2 clip) instead of touching YouTube.
-test('fetch → trim → generate → download → upload state', async ({ page }) => {
+// fixtures/sample.mp4 (4s testsrc2 clip) instead of touching YouTube. The Quick
+// (embed) UI needs youtube.com, so the UI journeys use Precise mode; the Quick
+// backend path is covered at the API level below.
+const usePreciseMode = async (page: Page): Promise<void> => {
+  await page.getByRole('radio', { name: /Precise/ }).click();
+};
+
+test('precise: fetch → trim → generate → download → upload state', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Crop the');
 
   await page
     .getByRole('textbox', { name: /YouTube link/i })
     .fill('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  await usePreciseMode(page);
   await page.getByRole('button', { name: /Fetch it/ }).click();
 
   await page.waitForURL(/\/edit\//, { timeout: 30_000 });
@@ -42,19 +50,59 @@ test('fetch → trim → generate → download → upload state', async ({ page 
   );
 });
 
+test('quick: resolve (no download) then section-download a clip via the API', async ({
+  request,
+}) => {
+  const resolveRes = await request.post('/api/resolve', {
+    data: { url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+  });
+  expect(resolveRes.status()).toBe(200);
+  const resolved = await resolveRes.json();
+  expect(resolved.youtubeId).toBe('dQw4w9WgXcQ');
+  expect(resolved.playableInEmbed).toBe(true);
+
+  const clipRes = await request.post('/api/clips', {
+    data: {
+      source: 'youtube',
+      youtubeId: resolved.youtubeId,
+      title: 'Quick clip',
+      startSec: 1,
+      endSec: 3,
+      mode: 'fast',
+    },
+  });
+  expect(clipRes.status()).toBe(202);
+  const { jobId } = await clipRes.json();
+
+  let state = 'queued';
+  for (let i = 0; i < 40 && state !== 'done' && state !== 'error'; i += 1) {
+    const job = await (await request.get(`/api/jobs/${jobId}`)).json();
+    state = job.state;
+    if (state === 'done' || state === 'error') {
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  expect(state).toBe('done');
+
+  const file = await request.get(`/api/clips/${jobId}/file`);
+  expect(file.status()).toBe(200);
+  expect(file.headers()['content-type']).toContain('video/mp4');
+  expect((await file.body()).length).toBeGreaterThan(10_000);
+});
+
 test('rejects a non-YouTube link before hitting the server', async ({ page }) => {
   await page.goto('/');
   const input = page.getByRole('textbox', { name: /YouTube link/i });
   await input.fill('https://vimeo.com/12345678');
-  await expect(page.getByRole('button', { name: /Fetch it/ })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /Preview it|Fetch it/ })).toBeDisabled();
   await expect(page.locator('.hint')).toContainText("doesn't look like a YouTube video link");
 });
 
 test('keyboard trimming works on the timeline handles', async ({ page }) => {
   await page.goto('/');
-  await page
-    .getByRole('textbox', { name: /YouTube link/i })
-    .fill('https://youtu.be/dQw4w9WgXcQ');
+  await page.getByRole('textbox', { name: /YouTube link/i }).fill('https://youtu.be/dQw4w9WgXcQ');
+  await usePreciseMode(page);
   await page.getByRole('button', { name: /Fetch it/ }).click();
   await page.waitForURL(/\/edit\//, { timeout: 30_000 });
 

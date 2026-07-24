@@ -2,15 +2,23 @@
   <section class="editor">
     <header class="editor-head">
       <h2 class="video-title">{{ meta.title }}</h2>
-      <span class="video-facts">{{ meta.width }}×{{ meta.height }}</span>
+      @if (meta.width > 0) {
+        <span class="video-facts">{{ meta.width }}×{{ meta.height }}</span>
+      } @else {
+        <span class="video-facts">preview · downloads only your clip</span>
+      }
     </header>
 
-    <app-video-player #player [src]="streamUrl()" />
+    @if (mode() === 'quick') {
+      <app-embed-player [videoId]="youtubeId()" />
+    } @else {
+      <app-video-player [src]="streamUrl()" />
+    }
 
     <app-controls-bar
-      (togglePlay)="player.toggle()"
-      (toggleMute)="player.toggleMute()"
-      (volumeChange)="player.setVolume($event)"
+      (togglePlay)="togglePlay()"
+      (toggleMute)="toggleMute()"
+      (volumeChange)="setVolume($event)"
     />
 
     <div class="trim-panel">
@@ -19,7 +27,7 @@
         [currentTime]="store.currentTime()"
         [(markIn)]="store.markIn"
         [(markOut)]="store.markOut"
-        (seek)="player.seek($event)"
+        (seek)="seek($event)"
       />
       <app-marker-inputs />
     </div>

@@ -1,0 +1,24 @@
+.frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: black;
+  border: 1.5px solid var(--color-edge);
+  box-shadow:
+    var(--shadow-pop),
+    0 0 60px oklch(24% 0.035 78 / 0.8);
+}
+
+/* YouTube renders an <iframe> (and, if enabled, a placeholder); make whichever
+   is present fill the 16:9 frame responsively. */
+:host ::ng-deep youtube-player,
+:host ::ng-deep iframe,
+:host ::ng-deep .youtube-player-placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+}

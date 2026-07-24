@@ -7,7 +7,9 @@ import { YoutubeUploadCard } from './youtube-upload-card';
 
 export interface ClipMetaResponse {
   clipId: string;
+  source: 'downloaded' | 'youtube';
   videoId: string;
+  youtubeId: string;
   title: string;
   startSec: number;
   endSec: number;
@@ -33,7 +35,12 @@ export class ResultPage {
 
   protected readonly streamUrl = computed(() => `/api/clips/${this.clipId()}/stream`);
   protected readonly downloadUrl = computed(() => this.api.clipFileUrl(this.clipId()));
-  protected readonly editUrl = computed(() => ['/edit', this.meta()?.videoId ?? '']);
+  protected readonly editUrl = computed(() => {
+    const meta = this.meta();
+    return meta?.source === 'youtube'
+      ? ['/preview', meta.youtubeId]
+      : ['/edit', meta?.videoId ?? ''];
+  });
   protected readonly factsLine = computed(() => {
     const meta = this.meta();
     if (!meta) {

@@ -7,6 +7,12 @@ export const routes: Routes = [
   },
   {
     path: 'edit/:videoId',
+    data: { mode: 'precise' },
+    loadComponent: () => import('./features/editor/editor-page').then((m) => m.EditorPage),
+  },
+  {
+    path: 'preview/:youtubeId',
+    data: { mode: 'quick' },
     loadComponent: () => import('./features/editor/editor-page').then((m) => m.EditorPage),
   },
   {

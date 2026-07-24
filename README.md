@@ -21,8 +21,12 @@ Open http://localhost:4200, paste a YouTube link, hit **Fetch it**.
 
 ## Features
 
-- **Fetch** any public YouTube video (≤ 4 h, capped at 1080p, h264+aac preferred)
-  with live progress over SSE
+- **Two ways to load a video:**
+  - **Quick preview (default)** — the video plays *instantly* in YouTube's own
+    embedded player (zero download). On Generate, only your selected seconds are
+    downloaded via `yt-dlp --download-sections` (~a few MB, not hundreds).
+  - **Precise** — downloads the full video into a native player for frame-perfect
+    visual scrubbing. Also the automatic fallback for videos that block embedding.
 - **Trim** with a dual-handle timeline (drag, keyboard arrows, typed timestamps,
   set-from-playhead), custom player controls (play/pause, mute, volume), and a
   preview loop over the selection

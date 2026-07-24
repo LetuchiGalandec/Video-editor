@@ -23,10 +23,23 @@ export interface UploadOptions {
   newPlaylistTitle?: string;
 }
 
+export interface ResolveResult {
+  youtubeId: string;
+  title: string;
+  durationSec: number;
+  playableInEmbed: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
 
+  /** Quick mode: metadata only, no download. */
+  resolve(url: string): Observable<ResolveResult> {
+    return this.http.post<ResolveResult>('/api/resolve', { url });
+  }
+
+  /** Precise mode: full download into the native player. */
   startDownload(url: string): Observable<{ jobId: string }> {
     return this.http.post<{ jobId: string }>('/api/downloads', { url });
   }
@@ -43,13 +56,38 @@ export class ApiService {
     return `/api/videos/${videoId}/stream`;
   }
 
+  /** Precise mode: crop the already-downloaded source. */
   createClip(
     videoId: string,
     startSec: number,
     endSec: number,
     mode: ClipMode,
   ): Observable<{ jobId: string }> {
-    return this.http.post<{ jobId: string }>('/api/clips', { videoId, startSec, endSec, mode });
+    return this.http.post<{ jobId: string }>('/api/clips', {
+      source: 'downloaded',
+      videoId,
+      startSec,
+      endSec,
+      mode,
+    });
+  }
+
+  /** Quick mode: download only the selected section. */
+  createClipFromYoutube(
+    youtubeId: string,
+    title: string,
+    startSec: number,
+    endSec: number,
+    mode: ClipMode,
+  ): Observable<{ jobId: string }> {
+    return this.http.post<{ jobId: string }>('/api/clips', {
+      source: 'youtube',
+      youtubeId,
+      title,
+      startSec,
+      endSec,
+      mode,
+    });
   }
 
   clipFileUrl(clipId: string): string {

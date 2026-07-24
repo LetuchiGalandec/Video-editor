@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { DownloadsService } from './downloads.service';
 import type { ResolveResult } from './downloads.service';
 
@@ -11,6 +11,7 @@ export class ResolveController {
   constructor(private readonly downloads: DownloadsService) {}
 
   @Post()
+  @HttpCode(200)
   resolve(@Body() body: ResolveDto): Promise<ResolveResult> {
     const url = typeof body?.url === 'string' ? body.url : '';
     return this.downloads.resolve(url);

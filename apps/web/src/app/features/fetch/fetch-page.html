@@ -4,8 +4,8 @@
       Crop the <span class="butter-word">good&nbsp;part</span>.
     </h1>
     <p class="lede">
-      Paste a YouTube link, trim exactly the seconds you want, then download the
-      clip — or tuck it into your channel as a Private video.
+      Paste a YouTube link — it previews instantly. Trim exactly the seconds you
+      want, then download just that clip or save it to your channel as Private.
     </p>
   </div>
 
@@ -24,13 +24,51 @@
         [disabled]="busy()"
       />
       <button class="btn btn-butter" type="submit" [disabled]="!isValidUrl() || busy()">
-        {{ busy() ? 'Fetching…' : 'Fetch it' }} <span aria-hidden="true">🍿</span>
+        {{ busy() ? 'Working…' : mode() === 'quick' ? 'Preview it' : 'Fetch it' }}
+        <span aria-hidden="true">🍿</span>
       </button>
     </div>
     @if (url() && !isValidUrl() && !busy()) {
       <p class="hint">Hmm, that doesn't look like a YouTube video link yet.</p>
     }
+
+    <div class="mode-picker" role="radiogroup" aria-label="How to load the video">
+      <button
+        type="button"
+        class="mode-chip"
+        role="radio"
+        [attr.aria-checked]="mode() === 'quick'"
+        [class.active]="mode() === 'quick'"
+        (click)="setMode('quick')"
+        [disabled]="busy()"
+      >
+        <span class="chip-name">⚡ Quick preview</span>
+        <span class="chip-hint">instant — downloads only your clip</span>
+      </button>
+      <button
+        type="button"
+        class="mode-chip"
+        role="radio"
+        [attr.aria-checked]="mode() === 'precise'"
+        [class.active]="mode() === 'precise'"
+        (click)="setMode('precise')"
+        [disabled]="busy()"
+      >
+        <span class="chip-name">🎯 Precise</span>
+        <span class="chip-hint">downloads full video, frame-perfect trim</span>
+      </button>
+    </div>
   </form>
+
+  @if (resolving()) {
+    <div class="progress-card" role="status" aria-live="polite">
+      <span class="stage">Reading the video…</span>
+    </div>
+  }
+
+  @if (fallbackNote()) {
+    <p class="fallback-note">{{ fallbackNote() }}</p>
+  }
 
   @if (job(); as j) {
     <app-progress-card [job]="j" />
