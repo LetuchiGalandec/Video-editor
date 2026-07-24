@@ -40,6 +40,18 @@ Open http://localhost:4200, paste a YouTube link, hit **Fetch it**.
   new private one
 - Fetched files and clips are swept from disk after 6 h (configurable)
 
+## Upload your own video
+
+Instead of pasting a YouTube URL, you can **drag and drop a video file** (or pick
+one from your device) and trim it the same way. The server automatically
+normalizes non-H.264 files — including iPhone HEVC, `.mkv`, `.webm`, and others
+— to MP4 format so they preview and trim smoothly in the player.
+
+To run the public **"upload only" build** (no YouTube fetching or sign-in), set
+`YOUTUBE_ENABLED=false` in `.env`. Upload size and duration limits are
+configurable via `MAX_UPLOAD_BYTES` (default 2 GB) and `MAX_UPLOAD_DURATION_SEC`
+(default 2 hours).
+
 ## Save-to-YouTube setup (one-time, ~5 minutes)
 
 1. Create a project at [console.cloud.google.com](https://console.cloud.google.com).
