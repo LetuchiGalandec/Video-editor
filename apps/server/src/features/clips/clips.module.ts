@@ -10,6 +10,6 @@ import { FfmpegService } from './ffmpeg.service';
   imports: [JobsModule, VideosModule, FetchModule],
   controllers: [ClipsController],
   providers: [ClipsService, FfmpegService],
-  exports: [ClipsService],
+  exports: [ClipsService, FfmpegService],
 })
 export class ClipsModule {}
