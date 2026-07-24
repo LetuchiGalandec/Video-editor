@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import type { ClipMode, Job, VideoMeta } from './api.models';
 
 export interface AuthUser {
@@ -29,6 +30,16 @@ export interface ResolveResult {
   durationSec: number;
   playableInEmbed: boolean;
 }
+
+export interface PublicConfig {
+  youtubeEnabled: boolean;
+  maxUploadBytes: number;
+  maxUploadDurationSec: number;
+}
+
+export type UploadEvent =
+  | { kind: 'progress'; percent: number }
+  | { kind: 'uploaded'; jobId: string };
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -119,5 +130,33 @@ export class ApiService {
       playlistId: options.playlistId ?? '',
       newPlaylistTitle: options.newPlaylistTitle ?? '',
     });
+  }
+
+  getConfig(): Observable<PublicConfig> {
+    return this.http.get<PublicConfig>('/api/config');
+  }
+
+  /** Upload a local file; emits transfer progress, then the created job id. */
+  uploadVideo(file: File): Observable<UploadEvent> {
+    const form = new FormData();
+    form.append('file', file);
+    const req = new HttpRequest('POST', '/api/videos', form, {
+      reportProgress: true,
+    });
+    return this.http.request<{ jobId: string }>(req).pipe(
+      map((event): UploadEvent | null => {
+        if (event.type === HttpEventType.UploadProgress) {
+          const percent = event.total
+            ? Math.round((event.loaded / event.total) * 100)
+            : 0;
+          return { kind: 'progress', percent };
+        }
+        if (event instanceof HttpResponse) {
+          return { kind: 'uploaded', jobId: event.body?.jobId ?? '' };
+        }
+        return null;
+      }),
+      filter((e): e is UploadEvent => e !== null),
+    );
   }
 }

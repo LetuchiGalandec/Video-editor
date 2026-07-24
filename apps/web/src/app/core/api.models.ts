@@ -1,4 +1,4 @@
-export type JobType = 'download' | 'clip' | 'upload';
+export type JobType = 'download' | 'clip' | 'upload' | 'ingest';
 
 export type JobState = 'queued' | 'running' | 'done' | 'error';
 

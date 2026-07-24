@@ -20,6 +20,12 @@ const STAGE_LABELS: Record<JobType, Record<JobState, string>> = {
     done: 'On your channel!',
     error: 'The upload flopped.',
   },
+  ingest: {
+    queued: 'Waiting to ingest…',
+    running: 'Ingesting your video…',
+    done: 'Ingested!',
+    error: 'The ingest failed.',
+  },
 };
 
 @Component({
