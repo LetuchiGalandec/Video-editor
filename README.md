@@ -2,7 +2,7 @@
 
 **Pop in a link · butter up a clip.** Paste a YouTube URL, trim exactly the
 seconds you want in a real player, then download the .mp4 — or save it straight
-to your channel as a **Private** video.
+to your channel as an **Unlisted** video.
 
 Personal tool / learning project. Angular 22 (signals, zoneless) + NestJS,
 yt-dlp + ffmpeg under the hood.
@@ -33,7 +33,7 @@ Open http://localhost:4200, paste a YouTube link, hit **Fetch it**.
 - **Generate** in two modes:
   - *Frame-accurate* (default) — re-encodes, exact to the frame
   - *Fast cut* — instant stream copy, snaps to keyframes (± a few seconds)
-- **Download** the .mp4, or **Save to YouTube** as a Private video (OAuth)
+- **Download** the .mp4, or **Save to YouTube** as an Unlisted video (OAuth)
 - **Multi-user**: any number of Google accounts can sign in; each browser gets its
   own session (signed cookie) and only ever touches its own channel
 - **Playlists**: on upload, drop the clip into an existing playlist or create a
@@ -67,8 +67,8 @@ configurable via `MAX_UPLOAD_BYTES` (default 2 GB) and `MAX_UPLOAD_DURATION_SEC`
    `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`. Restart the dev server.
 
 Then on a clip's result page: **Sign in with YouTube** → pick a playlist (or
-"Create new playlist…") → **Save to YouTube**. The clip uploads Private to your
-channel and lands in that playlist.
+"Create new playlist…") → **Save to YouTube**. The clip uploads Unlisted to your
+channel and lands in that playlist (the playlist itself is created Private).
 
 **Built multi-user, run locally.** The app is architected like a real public
 product — each browser gets its own signed session cookie, tokens are stored
@@ -80,7 +80,12 @@ signs in as themselves and touches only their own channel.
 **Known quirks of Testing mode:** refresh tokens expire every 7 days (the app
 shows "Sign in with YouTube" again — just reconnect), and the default API quota
 allows about **6 uploads per day** (`videos.insert` costs 1,600 of 10,000
-daily units; adding to a playlist is a further 50).
+daily units; adding to a playlist is a further 50). Also, YouTube restricts
+uploads from API projects that haven't passed its compliance audit: even though
+the app requests **Unlisted**, your video may land as **Private (locked)** in
+YouTube Studio. That's Google's policy, not a bug — the status stays locked
+until the project completes a [YouTube API audit](https://support.google.com/youtube/contact/yt_api_form),
+which isn't practical for a personal tool.
 
 ## Age-restricted videos
 
@@ -127,7 +132,7 @@ apps/server NestJS — features/
             fetch/   VideoFetcher seam: YtDlpFetcher (real) / FakeFetcher (fixture, e2e)
             videos/  ffprobe metadata + Range-request mp4 streaming
             clips/   ffmpeg trim (accurate re-encode / fast stream copy) + downloads
-            upload/  Google OAuth (tokens.json) + resumable YouTube upload (Private)
+            upload/  Google OAuth (tokens.json) + resumable YouTube upload (Unlisted)
 fixtures/   4s generated test video — tests and e2e never touch YouTube
 e2e/        Playwright suite
 ```

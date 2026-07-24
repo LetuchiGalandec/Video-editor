@@ -4,7 +4,7 @@
       <svg viewBox="0 0 24 24"><path d="M23 7.5a4 4 0 0 0-2.8-2.9C18 4 12 4 12 4s-6 0-8.2.6A4 4 0 0 0 1 7.5 42 42 0 0 0 .6 12c0 1.5.1 3 .4 4.5a4 4 0 0 0 2.8 2.9C6 20 12 20 12 20s6 0 8.2-.6a4 4 0 0 0 2.8-2.9c.3-1.5.4-3 .4-4.5s-.1-3-.4-4.5zM9.8 15.3V8.7l5.7 3.3z"/></svg>
     </span>
     <h3>Save to YouTube</h3>
-    <span class="private-badge">uploads as Private</span>
+    <span class="privacy-badge">uploads as Unlisted</span>
   </header>
 
   @switch (true) {
@@ -37,7 +37,7 @@
       @if (watchUrl()) {
         <div class="done-box">
           <p>
-            It's on your channel — <strong>Private</strong>, just for you.
+            It's on your channel — <strong>Unlisted</strong>, anyone with the link can watch.
             <a [href]="watchUrl()" target="_blank" rel="noopener">Watch it on YouTube ↗</a>
           </p>
         </div>

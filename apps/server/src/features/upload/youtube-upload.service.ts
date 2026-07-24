@@ -19,7 +19,7 @@ const CATEGORY_PEOPLE_AND_BLOGS = '22';
 
 @Injectable()
 export class YoutubeUploadService {
-  /** Resumable upload of the clip as a PRIVATE video on the signed-in channel. */
+  /** Resumable upload of the clip as an UNLISTED video on the signed-in channel. */
   async upload(
     client: OAuth2Client,
     input: UploadInput,
@@ -36,7 +36,7 @@ export class YoutubeUploadService {
             description: input.description,
             categoryId: CATEGORY_PEOPLE_AND_BLOGS,
           },
-          status: { privacyStatus: 'private', selfDeclaredMadeForKids: false },
+          status: { privacyStatus: 'unlisted', selfDeclaredMadeForKids: false },
         },
         media: { body: createReadStream(input.filePath) },
       },
