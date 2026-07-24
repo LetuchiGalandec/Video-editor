@@ -94,7 +94,14 @@ export class EditorPage {
   }
 
   private seedQuick(youtubeId: string, title: string, durationSec: number): void {
-    const meta: VideoMeta = { videoId: youtubeId, title, durationSec, width: 0, height: 0, sizeBytes: 0 };
+    const meta: VideoMeta = {
+      videoId: youtubeId,
+      title,
+      durationSec,
+      width: 0,
+      height: 0,
+      sizeBytes: 0,
+    };
     this.store.initFromMeta(meta);
   }
 

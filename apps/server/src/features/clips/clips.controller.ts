@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { ClipsService } from './clips.service';
 import type { ClipMeta, CreateClipInput } from './clips.service';
@@ -14,7 +22,8 @@ interface CreateClipDto {
   mode?: unknown;
 }
 
-const asString = (value: unknown): string => (typeof value === 'string' ? value : '');
+const asString = (value: unknown): string =>
+  typeof value === 'string' ? value : '';
 
 @Controller('clips')
 export class ClipsController {
@@ -47,7 +56,10 @@ export class ClipsController {
   }
 
   @Get(':clipId/stream')
-  async stream(@Param('clipId') clipId: string, @Res() res: Response): Promise<void> {
+  async stream(
+    @Param('clipId') clipId: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const filePath = await this.clips.clipPathOrThrow(clipId);
     res.sendFile(filePath, {
       headers: { 'Content-Type': 'video/mp4' },
@@ -57,7 +69,10 @@ export class ClipsController {
   }
 
   @Get(':clipId/file')
-  async file(@Param('clipId') clipId: string, @Res() res: Response): Promise<void> {
+  async file(
+    @Param('clipId') clipId: string,
+    @Res() res: Response,
+  ): Promise<void> {
     const filePath = await this.clips.clipPathOrThrow(clipId);
     res.sendFile(filePath, {
       headers: {

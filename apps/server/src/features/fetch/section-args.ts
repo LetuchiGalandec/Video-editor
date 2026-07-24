@@ -11,7 +11,11 @@ export interface SectionArgs {
  * re-encodes around the boundaries so the clip starts/ends on the exact frame
  * (slower); fast mode cuts at the nearest keyframe.
  */
-export function buildSectionArgs(startSec: number, endSec: number, cut: CutMode): SectionArgs {
+export function buildSectionArgs(
+  startSec: number,
+  endSec: number,
+  cut: CutMode,
+): SectionArgs {
   const args: SectionArgs = { downloadSections: `*${startSec}-${endSec}` };
   if (cut === 'accurate') {
     args.forceKeyframesAtCuts = true;

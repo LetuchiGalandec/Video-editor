@@ -40,7 +40,9 @@ export class DownloadsService {
   /** Metadata-only probe for the Quick (embed) flow — no download. */
   async resolve(url: string): Promise<ResolveResult> {
     if (!parseYoutubeVideoId(url)) {
-      throw new BadRequestException("That doesn't look like a YouTube video link.");
+      throw new BadRequestException(
+        "That doesn't look like a YouTube video link.",
+      );
     }
     let probe;
     try {
@@ -57,7 +59,9 @@ export class DownloadsService {
     }
     if (probe.durationSec > this.config.maxDurationSec) {
       const hours = Math.round(this.config.maxDurationSec / 3600);
-      throw new BadRequestException(`This video is longer than the ${hours}-hour limit.`);
+      throw new BadRequestException(
+        `This video is longer than the ${hours}-hour limit.`,
+      );
     }
     return {
       youtubeId: probe.videoId,

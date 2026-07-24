@@ -12,13 +12,21 @@ import type { VideosService } from '../videos/videos.service';
 import type { ProbeService } from '../videos/probe.service';
 import type { FfmpegService } from './ffmpeg.service';
 
-const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 10));
+const tick = (): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, 10));
 
 describe('ClipsService.createClip', () => {
   let dataDir: string;
   let store: JobStore;
-  let fetcher: { downloadSection: ReturnType<typeof vi.fn>; probe: ReturnType<typeof vi.fn>; download: ReturnType<typeof vi.fn> };
-  let videos: { sourcePathOrThrow: ReturnType<typeof vi.fn>; meta: ReturnType<typeof vi.fn> };
+  let fetcher: {
+    downloadSection: ReturnType<typeof vi.fn>;
+    probe: ReturnType<typeof vi.fn>;
+    download: ReturnType<typeof vi.fn>;
+  };
+  let videos: {
+    sourcePathOrThrow: ReturnType<typeof vi.fn>;
+    meta: ReturnType<typeof vi.fn>;
+  };
   let probe: { probe: ReturnType<typeof vi.fn> };
   let ffmpeg: { cut: ReturnType<typeof vi.fn> };
   let service: ClipsService;
@@ -35,7 +43,11 @@ describe('ClipsService.createClip', () => {
       sourcePathOrThrow: vi.fn().mockResolvedValue('/data/videos/v/source.mp4'),
       meta: vi.fn().mockResolvedValue({ title: 'Downloaded title' }),
     };
-    probe = { probe: vi.fn().mockResolvedValue({ durationSec: 100, width: 1280, height: 720 }) };
+    probe = {
+      probe: vi
+        .fn()
+        .mockResolvedValue({ durationSec: 100, width: 1280, height: 720 }),
+    };
     ffmpeg = { cut: vi.fn().mockResolvedValue(undefined) };
     service = new ClipsService(
       { ...loadConfig(), dataDir },
@@ -90,13 +102,27 @@ describe('ClipsService.createClip', () => {
 
   it('rejects a too-short selection', async () => {
     await expect(
-      service.createClip({ source: 'youtube', youtubeId: 'dQw4w9WgXcQ', title: 't', startSec: 5, endSec: 5.1, mode: 'fast' }),
+      service.createClip({
+        source: 'youtube',
+        youtubeId: 'dQw4w9WgXcQ',
+        title: 't',
+        startSec: 5,
+        endSec: 5.1,
+        mode: 'fast',
+      }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('rejects a malformed youtube id (path safety)', async () => {
     await expect(
-      service.createClip({ source: 'youtube', youtubeId: '../etc', title: 't', startSec: 0, endSec: 5, mode: 'fast' }),
+      service.createClip({
+        source: 'youtube',
+        youtubeId: '../etc',
+        title: 't',
+        startSec: 0,
+        endSec: 5,
+        mode: 'fast',
+      }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 

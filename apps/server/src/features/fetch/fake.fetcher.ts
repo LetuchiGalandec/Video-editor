@@ -7,7 +7,8 @@ import type { FetchedVideo, VideoFetcher, VideoProbe } from './video-fetcher';
 const PROGRESS_STEPS = [0, 25, 50, 75, 100];
 const STEP_DELAY_MS = 40;
 
-const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Test double for VideoFetcher: copies the committed fixture video instead of

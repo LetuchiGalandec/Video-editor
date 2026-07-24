@@ -13,7 +13,9 @@ describe('buildSectionArgs', () => {
       downloadSections: '*10-12.75',
       forceKeyframesAtCuts: true,
     });
-    expect(buildSectionArgs(10, 12.75, 'fast')).not.toHaveProperty('forceKeyframesAtCuts');
+    expect(buildSectionArgs(10, 12.75, 'fast')).not.toHaveProperty(
+      'forceKeyframesAtCuts',
+    );
   });
 
   it('always uses the "*" time-range prefix (not a chapter name)', () => {
