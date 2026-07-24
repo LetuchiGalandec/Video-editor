@@ -19,7 +19,14 @@ describe('IngestService', () => {
   let ffmpeg: { normalize: ReturnType<typeof vi.fn> };
   let service: IngestService;
 
-  const playable = { durationSec: 5, width: 640, height: 360, videoCodec: 'h264', audioCodec: 'aac', container: 'mov,mp4,m4a' };
+  const playable = {
+    durationSec: 5,
+    width: 640,
+    height: 360,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    container: 'mov,mp4,m4a',
+  };
 
   beforeEach(async () => {
     dataDir = await mkdtemp(join(tmpdir(), 'cropcorn-ingest-'));
@@ -58,7 +65,9 @@ describe('IngestService', () => {
     );
     expect(store.get(job.id)?.state).toBe('done');
     expect(store.get(job.id)?.result?.videoId).toBe(job.id);
-    const info = JSON.parse(await readFile(join(dataDir, 'videos', job.id, 'info.json'), 'utf-8'));
+    const info = JSON.parse(
+      await readFile(join(dataDir, 'videos', job.id, 'info.json'), 'utf-8'),
+    );
     expect(info.title).toBe('My Clip');
     await expect(stat(temp)).rejects.toThrow();
   });
@@ -84,8 +93,25 @@ describe('IngestService', () => {
     expect(ffmpeg.normalize).not.toHaveBeenCalled();
   });
 
+  it('cleans up the partial video dir and the temp upload on an error path', async () => {
+    probe.probe.mockResolvedValue({ ...playable, durationSec: 999 });
+    const temp = await makeTemp('too-long.mp4');
+    const job = await service.ingest(temp, 'too-long.mp4');
+    await tick();
+    expect(store.get(job.id)?.state).toBe('error');
+    await expect(stat(join(dataDir, 'videos', job.id))).rejects.toThrow();
+    await expect(stat(temp)).rejects.toThrow();
+  });
+
   it('errors the job when there is no video stream', async () => {
-    probe.probe.mockResolvedValue({ durationSec: 0, width: 0, height: 0, videoCodec: '', audioCodec: '', container: '' });
+    probe.probe.mockResolvedValue({
+      durationSec: 0,
+      width: 0,
+      height: 0,
+      videoCodec: '',
+      audioCodec: '',
+      container: '',
+    });
     const temp = await makeTemp('note.bin');
     const job = await service.ingest(temp, 'note.bin');
     await tick();

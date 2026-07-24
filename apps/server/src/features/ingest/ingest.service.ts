@@ -36,7 +36,11 @@ export class IngestService {
       try {
         await mkdir(videoDir, { recursive: true });
         const media = await this.probe.probe(tempPath);
-        if (media.width === 0 || media.height === 0 || media.durationSec === 0) {
+        if (
+          media.width === 0 ||
+          media.height === 0 ||
+          media.durationSec === 0
+        ) {
           throw new BadRequestException(
             'That file has no playable video stream.',
           );
@@ -64,10 +68,10 @@ export class IngestService {
         );
         this.store.patch(job.id, { result: { videoId: job.id } });
       } catch (error) {
-        await rm(videoDir, { recursive: true, force: true });
+        await rm(videoDir, { recursive: true, force: true }).catch(() => {});
         throw error;
       } finally {
-        await rm(tempPath, { force: true });
+        await rm(tempPath, { force: true }).catch(() => {});
       }
     });
     return job;
