@@ -47,3 +47,30 @@ test('POST /api/videos rejects a non-video upload with 400', async ({ request })
   });
   expect(res.status()).toBe(400);
 });
+
+test('UI: upload a file, reach the editor, generate and download a clip', async ({ page }) => {
+  await page.goto('/');
+
+  // Switch to the upload source if the YouTube option is present.
+  const uploadToggle = page.getByTestId('source-upload');
+  if (await uploadToggle.count()) {
+    await uploadToggle.click();
+  }
+
+  await page.getByTestId('file-input').setInputFiles(FIXTURE);
+
+  // Two-phase progress → lands on the native editor.
+  await page.waitForURL(/\/edit\//, { timeout: 30_000 });
+  await expect(page.locator('video')).toBeVisible();
+
+  // Generate a clip using the existing editor controls, then download.
+  await page.getByRole('button', { name: /generate/i }).click();
+  await page.waitForURL(/\/result\//, { timeout: 30_000 });
+
+  const downloadLink = page.getByRole('link', { name: /download/i });
+  const href = await downloadLink.getAttribute('href');
+  expect(href).toContain('/file');
+  const res = await page.request.get(`http://localhost:3000${href}`);
+  expect(res.status()).toBe(200);
+  expect(Number(res.headers()['content-length'])).toBeGreaterThan(0);
+});
