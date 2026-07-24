@@ -1,64 +1,115 @@
 <section class="hero">
   <div class="hero-copy">
-    <h1 class="headline">
-      Crop the <span class="butter-word">good&nbsp;part</span>.
-    </h1>
+    <h1 class="headline">Crop the <span class="butter-word">good&nbsp;part</span>.</h1>
     <p class="lede">
-      Paste a YouTube link — it previews instantly. Trim exactly the seconds you
-      want, then download just that clip or save it to your channel as Private.
+      Upload your own video, trim exactly the seconds you want, and download just that clip.
     </p>
   </div>
 
-  <form class="ticket" (submit)="$event.preventDefault(); submit()">
-    <label class="ticket-label" for="yt-url">YouTube link</label>
-    <div class="ticket-row">
+  @if (youtubeEnabled()) {
+    <div class="source-picker" role="radiogroup" aria-label="Video source">
+      <button
+        type="button"
+        class="source-chip"
+        role="radio"
+        data-testid="source-youtube"
+        [attr.aria-checked]="source() === 'youtube'"
+        [class.active]="source() === 'youtube'"
+        (click)="setSource('youtube')"
+        [disabled]="busy()"
+      >
+        🔗 YouTube link
+      </button>
+      <button
+        type="button"
+        class="source-chip"
+        role="radio"
+        data-testid="source-upload"
+        [attr.aria-checked]="source() === 'upload'"
+        [class.active]="source() === 'upload'"
+        (click)="setSource('upload')"
+        [disabled]="busy()"
+      >
+        ⬆️ Upload a video
+      </button>
+    </div>
+  }
+
+  @if (youtubeEnabled() && source() === 'youtube') {
+    <form class="ticket" (submit)="$event.preventDefault(); submit()">
+      <label class="ticket-label" for="yt-url">YouTube link</label>
+      <div class="ticket-row">
+        <input
+          id="yt-url"
+          data-testid="yt-url"
+          class="ticket-input"
+          type="url"
+          placeholder="https://www.youtube.com/watch?v=…"
+          autocomplete="off"
+          spellcheck="false"
+          [value]="url()"
+          (input)="onInput($any($event.target).value)"
+          [disabled]="busy()"
+        />
+        <button class="btn btn-butter" type="submit" [disabled]="!isValidUrl() || busy()">
+          {{ busy() ? 'Working…' : mode() === 'quick' ? 'Preview it' : 'Fetch it' }}
+          <span aria-hidden="true">🍿</span>
+        </button>
+      </div>
+      @if (url() && !isValidUrl() && !busy()) {
+        <p class="hint">Hmm, that doesn't look like a YouTube video link yet.</p>
+      }
+
+      <div class="mode-picker" role="radiogroup" aria-label="How to load the video">
+        <button
+          type="button"
+          class="mode-chip"
+          role="radio"
+          [attr.aria-checked]="mode() === 'quick'"
+          [class.active]="mode() === 'quick'"
+          (click)="setMode('quick')"
+          [disabled]="busy()"
+        >
+          <span class="chip-name">⚡ Quick preview</span>
+          <span class="chip-hint">instant — downloads only your clip</span>
+        </button>
+        <button
+          type="button"
+          class="mode-chip"
+          role="radio"
+          [attr.aria-checked]="mode() === 'precise'"
+          [class.active]="mode() === 'precise'"
+          (click)="setMode('precise')"
+          [disabled]="busy()"
+        >
+          <span class="chip-name">🎯 Precise</span>
+          <span class="chip-hint">downloads full video, frame-perfect trim</span>
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (source() === 'upload') {
+    <label class="dropzone" data-testid="upload-dropzone" [class.disabled]="busy()">
       <input
-        id="yt-url"
-        class="ticket-input"
-        type="url"
-        placeholder="https://www.youtube.com/watch?v=…"
-        autocomplete="off"
-        spellcheck="false"
-        [value]="url()"
-        (input)="onInput($any($event.target).value)"
+        type="file"
+        accept="video/*"
+        class="file-input"
+        data-testid="file-input"
+        (change)="onFileInput($event)"
         [disabled]="busy()"
       />
-      <button class="btn btn-butter" type="submit" [disabled]="!isValidUrl() || busy()">
-        {{ busy() ? 'Working…' : mode() === 'quick' ? 'Preview it' : 'Fetch it' }}
-        <span aria-hidden="true">🍿</span>
-      </button>
-    </div>
-    @if (url() && !isValidUrl() && !busy()) {
-      <p class="hint">Hmm, that doesn't look like a YouTube video link yet.</p>
-    }
+      <span class="dropzone-icon" aria-hidden="true">🎬</span>
+      <span class="dropzone-title">Choose a video to crop</span>
+      <span class="dropzone-hint">MP4, MOV, MKV, WebM — up to your configured limit</span>
+    </label>
+  }
 
-    <div class="mode-picker" role="radiogroup" aria-label="How to load the video">
-      <button
-        type="button"
-        class="mode-chip"
-        role="radio"
-        [attr.aria-checked]="mode() === 'quick'"
-        [class.active]="mode() === 'quick'"
-        (click)="setMode('quick')"
-        [disabled]="busy()"
-      >
-        <span class="chip-name">⚡ Quick preview</span>
-        <span class="chip-hint">instant — downloads only your clip</span>
-      </button>
-      <button
-        type="button"
-        class="mode-chip"
-        role="radio"
-        [attr.aria-checked]="mode() === 'precise'"
-        [class.active]="mode() === 'precise'"
-        (click)="setMode('precise')"
-        [disabled]="busy()"
-      >
-        <span class="chip-name">🎯 Precise</span>
-        <span class="chip-hint">downloads full video, frame-perfect trim</span>
-      </button>
+  @if (uploading()) {
+    <div class="progress-card" role="status" aria-live="polite">
+      <span class="stage">Uploading… {{ uploadPercent() }}%</span>
     </div>
-  </form>
+  }
 
   @if (resolving()) {
     <div class="progress-card" role="status" aria-live="polite">
