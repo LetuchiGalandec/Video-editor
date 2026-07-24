@@ -21,10 +21,10 @@ const STAGE_LABELS: Record<JobType, Record<JobState, string>> = {
     error: 'The upload flopped.',
   },
   ingest: {
-    queued: 'Waiting to ingest…',
-    running: 'Ingesting your video…',
-    done: 'Ingested!',
-    error: 'The ingest failed.',
+    queued: 'Waiting for a free popper…',
+    running: 'Prepping your video…',
+    done: 'Ready to trim!',
+    error: "Couldn't prep that video.",
   },
 };
 
