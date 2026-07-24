@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { buildClipArgs, parseFfmpegProgress, buildNormalizeArgs } from './ffmpeg-args';
+import {
+  buildClipArgs,
+  parseFfmpegProgress,
+  buildNormalizeArgs,
+} from './ffmpeg-args';
 
 const base = {
   inputPath: '/data/videos/abc/source.mp4',
@@ -89,18 +93,34 @@ describe('parseFfmpegProgress', () => {
 
 describe('buildNormalizeArgs', () => {
   it('remuxes with stream copy when transcode is false', () => {
-    const args = buildNormalizeArgs({ inputPath: 'in.mkv', outputPath: 'out.mp4', transcode: false });
+    const args = buildNormalizeArgs({
+      inputPath: 'in.mkv',
+      outputPath: 'out.mp4',
+      transcode: false,
+    });
     expect(args).toEqual([
-      '-y', '-i', 'in.mkv',
-      '-c', 'copy',
-      '-movflags', '+faststart',
-      '-progress', 'pipe:1', '-nostats', '-loglevel', 'error',
+      '-y',
+      '-i',
+      'in.mkv',
+      '-c',
+      'copy',
+      '-movflags',
+      '+faststart',
+      '-progress',
+      'pipe:1',
+      '-nostats',
+      '-loglevel',
+      'error',
       'out.mp4',
     ]);
   });
 
   it('re-encodes to h264/aac when transcode is true', () => {
-    const args = buildNormalizeArgs({ inputPath: 'in.mov', outputPath: 'out.mp4', transcode: true });
+    const args = buildNormalizeArgs({
+      inputPath: 'in.mov',
+      outputPath: 'out.mp4',
+      transcode: true,
+    });
     expect(args).toContain('libx264');
     expect(args).toContain('aac');
     expect(args.slice(0, 3)).toEqual(['-y', '-i', 'in.mov']);

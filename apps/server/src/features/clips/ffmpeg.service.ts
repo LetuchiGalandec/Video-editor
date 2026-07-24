@@ -1,7 +1,11 @@
 import { spawn } from 'node:child_process';
 import { Injectable } from '@nestjs/common';
 import ffmpegPath from 'ffmpeg-static';
-import { buildClipArgs, buildNormalizeArgs, parseFfmpegProgress } from './ffmpeg-args';
+import {
+  buildClipArgs,
+  buildNormalizeArgs,
+  parseFfmpegProgress,
+} from './ffmpeg-args';
 import type { ClipArgsInput, NormalizeArgsInput } from './ffmpeg-args';
 import * as readline from 'node:readline';
 

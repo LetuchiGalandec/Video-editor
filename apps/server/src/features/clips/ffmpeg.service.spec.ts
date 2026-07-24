@@ -16,7 +16,11 @@ describe('FfmpegService.normalize', () => {
     const out = join(dir, 'source.mp4');
     const ffmpeg = new FfmpegService();
     await ffmpeg.normalize(
-      { inputPath: loadConfig().fixturePath, outputPath: out, transcode: false },
+      {
+        inputPath: loadConfig().fixturePath,
+        outputPath: out,
+        transcode: false,
+      },
       4,
       () => undefined,
     );

@@ -90,7 +90,18 @@ export interface NormalizeArgsInput {
  */
 export function buildNormalizeArgs(input: NormalizeArgsInput): string[] {
   const codecArgs = input.transcode
-    ? ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-c:a', 'aac', '-b:a', '160k']
+    ? [
+        '-c:v',
+        'libx264',
+        '-preset',
+        'veryfast',
+        '-crf',
+        '20',
+        '-c:a',
+        'aac',
+        '-b:a',
+        '160k',
+      ]
     : ['-c', 'copy'];
   return [
     '-y',
