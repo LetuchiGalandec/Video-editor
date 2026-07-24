@@ -191,7 +191,7 @@
 .source-chip {
   flex: 1;
   padding: 0.6rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--color-edge);
   border-radius: 0.75rem;
   background: transparent;
   color: inherit;
@@ -201,8 +201,8 @@
     background 150ms ease;
 
   &.active {
-    border-color: var(--butter, #f5c451);
-    background: rgba(245, 196, 81, 0.12);
+    border-color: var(--color-butter);
+    background: color-mix(in oklch, var(--color-butter) 12%, transparent);
   }
 
   &:disabled {
@@ -217,7 +217,7 @@
   align-items: center;
   gap: 0.35rem;
   padding: clamp(1.5rem, 4vw, 3rem);
-  border: 2px dashed rgba(255, 255, 255, 0.25);
+  border: 2px dashed var(--color-edge);
   border-radius: 1rem;
   text-align: center;
   cursor: pointer;
@@ -226,8 +226,8 @@
     background 150ms ease;
 
   &:hover {
-    border-color: var(--butter, #f5c451);
-    background: rgba(245, 196, 81, 0.06);
+    border-color: var(--color-butter);
+    background: color-mix(in oklch, var(--color-butter) 6%, transparent);
   }
 
   &.disabled {
