@@ -76,3 +76,34 @@ export function parseFfmpegProgress(line: string): number | null {
   }
   return null;
 }
+
+export interface NormalizeArgsInput {
+  inputPath: string;
+  outputPath: string;
+  transcode: boolean;
+}
+
+/**
+ * ffmpeg argv to normalize an uploaded file into a browser-playable mp4.
+ * transcode=false → stream copy (near-instant); true → re-encode to h264/aac.
+ * Both write +faststart so the moov atom is at the front for seekable streaming.
+ */
+export function buildNormalizeArgs(input: NormalizeArgsInput): string[] {
+  const codecArgs = input.transcode
+    ? ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20', '-c:a', 'aac', '-b:a', '160k']
+    : ['-c', 'copy'];
+  return [
+    '-y',
+    '-i',
+    input.inputPath,
+    ...codecArgs,
+    '-movflags',
+    '+faststart',
+    '-progress',
+    'pipe:1',
+    '-nostats',
+    '-loglevel',
+    'error',
+    input.outputPath,
+  ];
+}
