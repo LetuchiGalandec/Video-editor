@@ -9,11 +9,19 @@ export interface MediaProbe {
   durationSec: number;
   width: number;
   height: number;
+  videoCodec: string;
+  audioCodec: string;
+  container: string;
 }
 
 interface FfprobeOutput {
-  format?: { duration?: string };
-  streams?: Array<{ codec_type?: string; width?: number; height?: number }>;
+  format?: { duration?: string; format_name?: string };
+  streams?: Array<{
+    codec_type?: string;
+    codec_name?: string;
+    width?: number;
+    height?: number;
+  }>;
 }
 
 @Injectable()
@@ -25,17 +33,21 @@ export class ProbeService {
       '-v',
       'error',
       '-show_entries',
-      'format=duration:stream=codec_type,width,height',
+      'format=duration,format_name:stream=codec_type,codec_name,width,height',
       '-of',
       'json',
       filePath,
     ]);
     const parsed = JSON.parse(stdout) as FfprobeOutput;
     const video = parsed.streams?.find((s) => s.codec_type === 'video');
+    const audio = parsed.streams?.find((s) => s.codec_type === 'audio');
     return {
       durationSec: Number.parseFloat(parsed.format?.duration ?? '0') || 0,
       width: video?.width ?? 0,
       height: video?.height ?? 0,
+      videoCodec: video?.codec_name ?? '',
+      audioCodec: audio?.codec_name ?? '',
+      container: parsed.format?.format_name ?? '',
     };
   }
 }
