@@ -9,12 +9,15 @@ import {
 import { APP_CONFIG } from '../../config/config';
 import type { AppConfig } from '../../config/config';
 import { DownloadsService } from './downloads.service';
+import { Throttle } from '@nestjs/throttler';
+import { EXPENSIVE_THROTTLE } from '../../throttler-config';
 
 interface StartDownloadDto {
   url?: unknown;
 }
 
 @Controller('downloads')
+@Throttle({ default: EXPENSIVE_THROTTLE })
 export class DownloadsController {
   constructor(
     private readonly downloads: DownloadsService,

@@ -11,6 +11,8 @@ import type { Response } from 'express';
 import { ClipsService } from './clips.service';
 import type { ClipMeta, CreateClipInput } from './clips.service';
 import type { ClipMode } from './ffmpeg-args';
+import { Throttle } from '@nestjs/throttler';
+import { EXPENSIVE_THROTTLE } from '../../throttler-config';
 
 interface CreateClipDto {
   source?: unknown;
@@ -26,6 +28,7 @@ const asString = (value: unknown): string =>
   typeof value === 'string' ? value : '';
 
 @Controller('clips')
+@Throttle({ default: EXPENSIVE_THROTTLE })
 export class ClipsController {
   constructor(private readonly clips: ClipsService) {}
 

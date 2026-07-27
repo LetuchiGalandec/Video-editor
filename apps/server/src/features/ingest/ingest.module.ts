@@ -9,6 +9,7 @@ import type { AppConfig } from '../../config/config';
 import { ClipsModule } from '../clips/clips.module';
 import { JobsModule } from '../jobs/jobs.module';
 import { VideosModule } from '../videos/videos.module';
+import { DiskSpaceGuard } from './disk-space.guard';
 import { IngestController } from './ingest.controller';
 import { IngestService } from './ingest.service';
 import { PublicConfigController } from './public-config.controller';
@@ -46,6 +47,6 @@ import { PublicConfigController } from './public-config.controller';
     }),
   ],
   controllers: [IngestController, PublicConfigController],
-  providers: [IngestService],
+  providers: [IngestService, DiskSpaceGuard],
 })
 export class IngestModule {}
