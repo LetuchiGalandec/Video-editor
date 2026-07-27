@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cropcorn-api:local
+    env_file: apps/server/.env
+    volumes:
+      - cropcorn-data:/data
+    # Published so the Google OAuth callback registered at
+    # http://localhost:3000/api/auth/google/callback keeps working unchanged.
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: cropcorn-web:local
+    # 4200 matches the server's default WEB_ORIGIN, so the post-sign-in redirect
+    # lands back on the app without extra configuration.
+    ports:
+      - '4200:80'
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  cropcorn-data:
