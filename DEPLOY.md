@@ -111,8 +111,8 @@ openssl rand -hex 32
 Then:
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
-docker compose -f docker-compose.prod.yml logs -f caddy   # watch the cert issue
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+docker compose --env-file .env.prod -f docker-compose.prod.yml logs -f caddy   # watch the cert issue
 ```
 
 The first build takes several minutes on ARM. Caddy fetches the certificate on
@@ -131,7 +131,7 @@ https://<your-domain>/api/auth/google/callback
 Then put the client ID and secret in `.env.prod` and restart:
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
 ```
 
 While the OAuth consent screen is in **Testing**, only accounts you add as test
@@ -158,16 +158,16 @@ upload-only build with no broken buttons.
 
 ```bash
 # logs
-docker compose -f docker-compose.prod.yml logs -f api
+docker compose --env-file .env.prod -f docker-compose.prod.yml logs -f api
 
 # update after a git push
-git pull && docker compose -f docker-compose.prod.yml up -d --build
+git pull && docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 
 # disk usage (clips are swept after TTL_MINUTES, but check anyway)
 docker system df && df -h
 
 # stop
-docker compose -f docker-compose.prod.yml down
+docker compose --env-file .env.prod -f docker-compose.prod.yml down
 ```
 
 ### What protects the box

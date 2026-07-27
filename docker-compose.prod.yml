@@ -8,7 +8,12 @@
 # Only caddy publishes ports. web and api are reachable solely over the private
 # compose network, so the API cannot be hit directly, bypassing the proxy.
 #
-#   docker compose -f docker-compose.prod.yml up -d --build
+# --env-file is required, not optional. `env_file:` below only injects variables
+# into containers; it does not feed ${...} substitution, which compose resolves
+# from the shell or a default `.env`. Omit it and CROPCORN_DOMAIN expands to an
+# empty string, leaving Caddy with no site address and no certificate.
+#
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
 
 services:
   api:
