@@ -1,5 +1,6 @@
 import { mkdir } from 'node:fs/promises';
 import * as path from 'node:path';
+import { Logger } from '@nestjs/common';
 import youtubedl from 'youtube-dl-exec';
 import ffmpegPath from 'ffmpeg-static';
 import { DownloadProgressTracker, PROGRESS_TEMPLATE } from './ytdlp-progress';
@@ -47,6 +48,8 @@ const ytdlpModule = youtubedl as unknown as YtDlpModuleExtras;
 
 const YT_DLP_BINARY =
   process.env.YTDLP_PATH ?? ytdlpModule.constants.YOUTUBE_DL_PATH;
+
+const logger = new Logger('YtDlpFetcher');
 
 export interface FetcherOptions extends CookieOptions {
   /** Highest video height to fetch (default 1080). Lower = smaller/faster. */
@@ -139,9 +142,15 @@ async function runYtDlp(
       );
     }
     if (error instanceof ProcessExitError) {
-      throw mapYtDlpError(error.stderr || error.message);
+      const stderr = error.stderr || error.message;
+      // The user-facing FetchError is deliberately vague; without this the raw
+      // reason yt-dlp failed is lost and the failure cannot be diagnosed.
+      logger.warn(`yt-dlp exited ${error.code} for ${url}\n${stderr}`);
+      throw mapYtDlpError(stderr);
     }
-    throw mapYtDlpError(error instanceof Error ? error.message : String(error));
+    const reason = error instanceof Error ? error.message : String(error);
+    logger.warn(`yt-dlp failed to run for ${url}: ${reason}`);
+    throw mapYtDlpError(reason);
   }
 }
 
