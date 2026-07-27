@@ -1,0 +1,66 @@
+# Production stack for a single public VM (built for Oracle Cloud Always Free
+# ARM, but nothing here is Oracle-specific).
+#
+#   caddy  :443  terminates TLS, obtains and renews Let's Encrypt certs
+#     -> web     nginx serving the Angular bundle, proxying /api
+#       -> api   NestJS + yt-dlp + ffmpeg
+#
+# Only caddy publishes ports. web and api are reachable solely over the private
+# compose network, so the API cannot be hit directly, bypassing the proxy.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cropcorn-api:local
+    env_file: .env.prod
+    environment:
+      # Both must be the public HTTPS origin: Google rejects a redirect URI
+      # that does not match the one registered in the console, and the server
+      # sends the user back to WEB_ORIGIN after sign-in.
+      OAUTH_REDIRECT_URI: https://${CROPCORN_DOMAIN}/api/auth/google/callback
+      WEB_ORIGIN: https://${CROPCORN_DOMAIN}
+    volumes:
+      - cropcorn-data:/data
+    restart: unless-stopped
+    # ffmpeg will happily consume every core and starve the proxy, making the
+    # site unreachable while a clip renders.
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: cropcorn-web:local
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      CROPCORN_DOMAIN: ${CROPCORN_DOMAIN}
+      CROPCORN_TLS_EMAIL: ${CROPCORN_TLS_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates must survive recreation, or Let's Encrypt rate limits are
+      # hit after a handful of redeploys.
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  cropcorn-data:
+  caddy-data:
+  caddy-config:

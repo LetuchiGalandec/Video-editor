@@ -1,0 +1,27 @@
+{
+	email {$CROPCORN_TLS_EMAIL}
+}
+
+{$CROPCORN_DOMAIN} {
+	# Caddy obtains and renews the certificate automatically; nothing else to do
+	# beyond pointing the domain's A record at this machine.
+	encode gzip
+
+	reverse_proxy web:80 {
+		# /api/jobs/:id/events is Server-Sent Events. Buffering would hold
+		# progress until the job ended, so the UI would sit at 0% and then jump
+		# straight to done.
+		flush_interval -1
+	}
+
+	# No explicit timeouts: Caddy 2 does not impose read/write deadlines by
+	# default, which is what long clip renders and large uploads need. The
+	# per-hop limits that do matter are set in nginx.conf.
+
+	header {
+		# Caddy serves the only public origin, so HSTS belongs here rather than
+		# on the API, which is no longer directly reachable.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+}

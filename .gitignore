@@ -9,8 +9,12 @@ dist/
 .data/
 .data-e2e/
 
-# Environment
+# Environment. The bare `.env` pattern does not match `.env.prod`, which holds
+# the session secret and OAuth credentials — match every variant but keep the
+# committed *.example templates.
 .env
+.env.*
+!.env.*.example
 
 # Test artifacts
 coverage/
