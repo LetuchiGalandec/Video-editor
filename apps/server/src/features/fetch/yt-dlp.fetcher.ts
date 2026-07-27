@@ -2,7 +2,7 @@ import { mkdir } from 'node:fs/promises';
 import * as path from 'node:path';
 import { Logger } from '@nestjs/common';
 import youtubedl from 'youtube-dl-exec';
-import ffmpegPath from 'ffmpeg-static';
+import ffmpegStaticPath from 'ffmpeg-static';
 import { DownloadProgressTracker, PROGRESS_TEMPLATE } from './ytdlp-progress';
 import { buildCookieFlags } from './cookie-flags';
 import type { CookieFlags, CookieOptions } from './cookie-flags';
@@ -48,6 +48,13 @@ const ytdlpModule = youtubedl as unknown as YtDlpModuleExtras;
 
 const YT_DLP_BINARY =
   process.env.YTDLP_PATH ?? ytdlpModule.constants.YOUTUBE_DL_PATH;
+
+// Matches FfmpegService/ProbeService: FFMPEG_PATH wins over the bundled binary.
+// This is load-bearing in containers — ffmpeg-static ships a fully static build,
+// and static glibc cannot resolve hostnames (NSS dlopens its resolver at run
+// time), so section downloads die with "Failed to resolve hostname ... System
+// error" while a dynamically linked system ffmpeg works fine.
+const FFMPEG_BINARY = process.env.FFMPEG_PATH ?? ffmpegStaticPath ?? null;
 
 const logger = new Logger('YtDlpFetcher');
 
@@ -212,7 +219,7 @@ export class YtDlpFetcher implements VideoFetcher {
         noWarnings: true,
         ...RESILIENCE_FLAGS,
         ...this.cookieFlags,
-        ...(ffmpegPath ? { ffmpegLocation: ffmpegPath } : {}),
+        ...(FFMPEG_BINARY ? { ffmpegLocation: FFMPEG_BINARY } : {}),
       },
       (line) => {
         const percent = tracker.onLine(line);
@@ -247,7 +254,7 @@ export class YtDlpFetcher implements VideoFetcher {
         ...buildSectionArgs(startSec, endSec, cut),
         ...RESILIENCE_FLAGS,
         ...this.cookieFlags,
-        ...(ffmpegPath ? { ffmpegLocation: ffmpegPath } : {}),
+        ...(FFMPEG_BINARY ? { ffmpegLocation: FFMPEG_BINARY } : {}),
       },
       (line) => {
         const percent = tracker.onLine(line);

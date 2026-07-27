@@ -1,0 +1,28 @@
+# Never ship secrets into the build context.
+.env
+**/.env
+
+# Reinstalled in the build stage; copying host builds breaks native binaries.
+node_modules
+**/node_modules
+dist
+**/dist
+.angular
+
+# Runtime data (videos, clips, OAuth tokens)
+.data
+**/.data
+.data-e2e
+
+# Test + tooling artifacts
+coverage
+playwright-report
+test-results
+.gitnexus
+
+# VCS / editor / OS
+.git
+.gitignore
+.DS_Store
+.claude
+.superpowers
