@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   clientXToSeconds,
   clampMarker,
+  clampPlayhead,
   keyboardStep,
   MIN_MARKER_GAP_SEC,
 } from './trim-timeline-math';
@@ -41,6 +42,19 @@ describe('clampMarker', () => {
     expect(clampMarker('out', 5.01, { markIn: 5, markOut: 10, duration: 20 })).toBe(
       5 + MIN_MARKER_GAP_SEC,
     );
+  });
+});
+
+describe('clampPlayhead', () => {
+  it('holds the playhead inside the selection', () => {
+    expect(clampPlayhead(2, 10, 60)).toBe(10);
+    expect(clampPlayhead(25, 10, 60)).toBe(25);
+    expect(clampPlayhead(90, 10, 60)).toBe(60);
+  });
+
+  it('accepts the markers themselves', () => {
+    expect(clampPlayhead(10, 10, 60)).toBe(10);
+    expect(clampPlayhead(60, 10, 60)).toBe(60);
   });
 });
 

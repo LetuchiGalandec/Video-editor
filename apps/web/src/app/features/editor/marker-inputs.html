@@ -8,8 +8,10 @@
       inputmode="decimal"
       autocomplete="off"
       spellcheck="false"
+      title="Type a timestamp, or nudge with ↑↓ (±0.1s, ±1s with Shift, ±10s with Page Up/Down)"
       [value]="inText()"
       (change)="commit('in', $any($event.target))"
+      (keydown)="onKeydown('in', $event, $any($event.target))"
     />
     <button
       class="from-playhead"
@@ -35,8 +37,10 @@
       inputmode="decimal"
       autocomplete="off"
       spellcheck="false"
+      title="Type a timestamp, or nudge with ↑↓ (±0.1s, ±1s with Shift, ±10s with Page Up/Down)"
       [value]="outText()"
       (change)="commit('out', $any($event.target))"
+      (keydown)="onKeydown('out', $event, $any($event.target))"
     />
     <button
       class="from-playhead"

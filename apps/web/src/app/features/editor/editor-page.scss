@@ -54,6 +54,15 @@
 }
 
 .mode-option {
+  /*
+   * Sits concentric inside .mode-toggle: the parent's outer radius less its
+   * border, so the active ring curves parallel to the frame rather than
+   * crowding it. The active state is an inset box-shadow, and a box-shadow
+   * traces the element's own radius — without one it draws a hard rectangle,
+   * and only the corners the parent happens to clip look round.
+   */
+  --mode-option-radius: calc(var(--radius-md) - 1.5px);
+
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -68,6 +77,15 @@
   transition:
     background-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out);
+
+  /* Only the outer edges round; the seam between options stays square. */
+  &:first-child {
+    border-radius: var(--mode-option-radius) 0 0 var(--mode-option-radius);
+  }
+
+  &:last-child {
+    border-radius: 0 var(--mode-option-radius) var(--mode-option-radius) 0;
+  }
 
   & + & {
     border-left: 1.5px solid var(--color-edge);

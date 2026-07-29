@@ -3,7 +3,21 @@
   <div class="selection" [style.left.%]="inPct()" [style.width.%]="outPct() - inPct()"></div>
   <div class="dim dim-right" [style.left.%]="outPct()" [style.width.%]="100 - outPct()"></div>
 
-  <div class="playhead" [style.left.%]="playheadPct()" aria-hidden="true"></div>
+  <button
+    type="button"
+    class="playhead"
+    #playhead
+    role="slider"
+    aria-label="Playhead"
+    [attr.aria-valuemin]="markIn()"
+    [attr.aria-valuemax]="markOut()"
+    [attr.aria-valuenow]="playheadTime()"
+    [attr.aria-valuetext]="playheadLabel()"
+    [style.left.%]="playheadPct()"
+    [class.pointer-focus]="pointerFocused()"
+    (keydown)="onPlayheadKeydown($event)"
+    (blur)="pointerFocused.set(false)"
+  ></button>
 
   <button
     type="button"
@@ -18,7 +32,12 @@
     (pointerdown)="onHandlePointerDown('in', $event)"
     (keydown)="onHandleKeydown('in', $event)"
   >
-    <span class="chip">{{ inLabel() }}</span>
+    <span class="chip">
+      @if (frameFor('in'); as frame) {
+        <img class="chip-frame" [src]="frame" [width]="thumbWidth" [height]="thumbHeight" alt="" />
+      }
+      <span class="chip-time">{{ inLabel() }}</span>
+    </span>
   </button>
 
   <button
@@ -34,6 +53,11 @@
     (pointerdown)="onHandlePointerDown('out', $event)"
     (keydown)="onHandleKeydown('out', $event)"
   >
-    <span class="chip">{{ outLabel() }}</span>
+    <span class="chip">
+      @if (frameFor('out'); as frame) {
+        <img class="chip-frame" [src]="frame" [width]="thumbWidth" [height]="thumbHeight" alt="" />
+      }
+      <span class="chip-time">{{ outLabel() }}</span>
+    </span>
   </button>
 </div>

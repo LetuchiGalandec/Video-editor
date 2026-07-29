@@ -18,6 +18,8 @@
   border: 1.5px solid var(--color-edge);
   cursor: pointer;
   touch-action: none;
+  /* a scrub drag must not sweep-select the time chips */
+  user-select: none;
 }
 
 .dim {
@@ -46,18 +48,47 @@
   border-block: 2px solid var(--color-butter);
   box-shadow: inset 0 0 18px oklch(86% 0.15 92 / 0.16);
   pointer-events: none;
+  /*
+   * Deliberately square. The band's edges land on the markers, which sit
+   * anywhere along the track, and a rounded edge curves away from the kernel
+   * it is supposed to meet.
+   */
 }
 
+/*
+ * Grabbable scrubber. The visible line stays 2px, but a 2px-wide hit target is
+ * unusable with a mouse, so the button itself is 18px of transparent grab area
+ * and the line is drawn by ::after.
+ */
 .playhead {
   position: absolute;
   top: -4px;
   bottom: -4px;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--color-text);
-  box-shadow: 0 0 6px oklch(94% 0.03 90 / 0.7);
-  pointer-events: none;
+  width: 18px;
+  margin-left: -9px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+  touch-action: none;
 
+  &:active {
+    cursor: grabbing;
+  }
+
+  /* the line */
+  &::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--color-text);
+    box-shadow: 0 0 6px oklch(94% 0.03 90 / 0.7);
+  }
+
+  /* the arrowhead */
   &::before {
     content: '';
     position: absolute;
@@ -66,6 +97,24 @@
     transform: translateX(-50%);
     border: 5px solid transparent;
     border-top-color: var(--color-text);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  &:hover::before,
+  &:focus-visible::before,
+  &:active::before {
+    transform: translateX(-50%) scale(1.35);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-butter);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* a mouse grab is not a keyboard focus, whatever Chrome reports */
+  &.pointer-focus:focus-visible {
+    outline: none;
   }
 }
 
@@ -117,6 +166,25 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--duration-fast) var(--ease-out);
+  /* Taller than the panel once a thumbnail is in it, so it floats over the
+     controls above rather than being squeezed in. */
+  z-index: 2;
+}
+
+.chip-frame {
+  display: block;
+  width: 160px;
+  height: 90px;
+  /* The grabber already crops to this box; object-fit guards odd sources. */
+  object-fit: cover;
+  border-radius: 3px;
+  background: black;
+  margin-bottom: 4px;
+}
+
+.chip-time {
+  display: block;
+  text-align: center;
 }
 
 .handle:hover .chip,

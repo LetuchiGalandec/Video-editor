@@ -31,6 +31,15 @@ export function clampMarker(kind: MarkerKind, seconds: number, ctx: MarkerContex
   return Math.min(ctx.duration, Math.max(seconds, ctx.markIn + MIN_MARKER_GAP_SEC));
 }
 
+/**
+ * Holds the playhead inside the selection. The preview only ever shows frames
+ * the exported clip will contain, so parking it in the dimmed region either
+ * side would preview footage that gets cut.
+ */
+export function clampPlayhead(seconds: number, markIn: number, markOut: number): number {
+  return Math.min(markOut, Math.max(markIn, seconds));
+}
+
 /** Arrow-key nudge size: ±0.1s, ±1s with Shift; null for unrelated keys. */
 export function keyboardStep(key: string, shiftKey: boolean): number | null {
   const direction = key === 'ArrowRight' ? 1 : key === 'ArrowLeft' ? -1 : 0;

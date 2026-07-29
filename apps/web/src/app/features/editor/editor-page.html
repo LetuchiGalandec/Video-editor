@@ -27,6 +27,7 @@
         [currentTime]="store.currentTime()"
         [(markIn)]="store.markIn"
         [(markOut)]="store.markOut"
+        [previewSrc]="streamUrl()"
         (seek)="seek($event)"
       />
       <app-marker-inputs />
