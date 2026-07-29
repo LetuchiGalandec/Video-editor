@@ -21,8 +21,9 @@ import { VideosModule } from './features/videos/videos.module';
       // continuously; throttling them stalls progress bars and breaks seeking.
       skipIf: (context) =>
         isThrottleExempt(
-          context.switchToHttp().getRequest<{ originalUrl?: string; url: string }>()
-            .originalUrl ??
+          context
+            .switchToHttp()
+            .getRequest<{ originalUrl?: string; url: string }>().originalUrl ??
             context.switchToHttp().getRequest<{ url: string }>().url,
         ),
     }),

@@ -29,7 +29,9 @@ describe('hasRoomFor', () => {
     const incomingBytes = 1 * GIB;
     const justEnough = incomingBytes * 2 + DISK_HEADROOM_BYTES;
     expect(hasRoomFor({ freeBytes: justEnough + 1, incomingBytes })).toBe(true);
-    expect(hasRoomFor({ freeBytes: justEnough - 1, incomingBytes })).toBe(false);
+    expect(hasRoomFor({ freeBytes: justEnough - 1, incomingBytes })).toBe(
+      false,
+    );
   });
 
   it('rejects when free space cannot be determined', () => {
